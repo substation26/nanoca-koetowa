@@ -353,7 +353,7 @@ body{font-family:'Zen Maru Gothic','Noto Sans JP',sans-serif;background:#0E0818;
 .conf-pct{font-size:1.1rem;font-weight:900;display:block;line-height:1;}
 .conf-lbl{font-size:.5rem;color:rgba(255,255,255,.5);font-weight:700;letter-spacing:.06em;}
 
-.res-info{padding:20px 20px 24px;}
+.res-info{padding:20px 20px 28px;}
 .color-bar{height:3px;border-radius:2px;margin-bottom:14px;}
 .res-name{font-size:1.5rem;font-weight:900;margin-bottom:3px;line-height:1.2;}
 .res-en{font-size:.68rem;font-weight:700;letter-spacing:.14em;color:rgba(255,255,255,.35);margin-bottom:6px;}
@@ -365,12 +365,12 @@ body{font-family:'Zen Maru Gothic','Noto Sans JP',sans-serif;background:#0E0818;
 .radar-ttl{font-size:.6rem;font-weight:900;color:rgba(155,110,212,.8);letter-spacing:.1em;margin-bottom:8px;}
 
 /* Result blocks */
-.rb{border-radius:12px;padding:12px 14px;margin-bottom:10px;border:1px solid rgba(255,255,255,.06);}
-.rb .lbl{font-size:.58rem;font-weight:900;letter-spacing:.14em;margin-bottom:5px;}
-.rb p{font-size:.82rem;line-height:1.75;color:rgba(255,255,255,.7);}
-.rb ul{list-style:none;padding:0;}
-.rb ul li{padding:2px 0;display:flex;align-items:flex-start;gap:6px;font-size:.82rem;line-height:1.7;color:rgba(255,255,255,.7);}
-.rb ul li::before{content:'▸';color:var(--orange);flex-shrink:0;margin-top:1px;}
+.rb{border-radius:16px;padding:16px 18px;margin-bottom:24px;border:1px solid rgba(255,255,255,.07);box-sizing:border-box;}
+.rb .lbl{font-size:.6rem;font-weight:900;letter-spacing:.14em;margin-bottom:10px;display:block;}
+.rb p{font-size:.86rem;line-height:1.85;color:rgba(255,255,255,.78);margin:0;word-break:break-word;}
+.rb ul{list-style:none;padding:0;margin:0;}
+.rb ul li{padding:4px 0;display:flex;align-items:flex-start;gap:8px;font-size:.84rem;line-height:1.75;color:rgba(255,255,255,.75);}
+.rb ul li::before{content:'▸';color:var(--orange);flex-shrink:0;margin-top:2px;}
 .rb-str{background:linear-gradient(135deg,rgba(232,132,58,.12),rgba(232,82,82,.08));}
 .rb-str .lbl{color:#FFB07C;}
 .rb-sce{background:rgba(255,255,255,.04);}
@@ -865,10 +865,133 @@ body{font-family:'Zen Maru Gothic','Noto Sans JP',sans-serif;background:#0E0818;
   border-color: rgba(232,132,58,.6);
   color: #FFB07C; transform: translateX(3px);
 }
+
+/* ===== CREDITS & LEGAL ===== */
+.credits-block {
+  max-width: 600px; margin: 20px auto 0;
+  display: flex; flex-direction: column; gap: 6px;
+  padding: 14px 20px;
+  background: rgba(255,255,255,.03);
+  border: 1px solid rgba(255,255,255,.07);
+  border-radius: 12px;
+}
+.credit-row {
+  display: flex; align-items: center; gap: 12px;
+  font-size: .65rem;
+}
+.credit-label {
+  color: rgba(255,255,255,.3); font-weight: 700;
+  letter-spacing: .08em; min-width: 130px; flex-shrink: 0;
+}
+.credit-val {
+  color: rgba(255,255,255,.55); font-weight: 700;
+}
+.legal-block {
+  max-width: 600px; margin: 12px auto 0;
+  padding: 12px 20px;
+  text-align: center;
+}
+.legal-block p {
+  font-size: .6rem; color: rgba(255,255,255,.2);
+  line-height: 1.8; margin: 0;
+}
+.legal-block p:first-child {
+  color: rgba(255,255,255,.3); font-weight: 700; margin-bottom: 4px;
+}
+
+/* ===== MOBILE POLISH ===== */
+/* 結果カード全体 */
+.result-inner { max-width: 600px; margin: 0 auto; }
+.res-info { padding: 22px 18px 28px; }
+
+/* rb統一ルール強化 */
+.rb {
+  border-radius: 16px;
+  padding: 16px 18px;
+  margin-bottom: 24px;
+  border: 1px solid rgba(255,255,255,.07);
+  box-sizing: border-box;
+  word-break: break-word;
+  overflow-wrap: break-word;
+}
+.rb .lbl {
+  font-size: .6rem; font-weight: 900;
+  letter-spacing: .14em; margin-bottom: 10px;
+  display: block;
+}
+.rb p {
+  font-size: .88rem; line-height: 1.85;
+  color: rgba(255,255,255,.78); margin: 0;
+  word-break: break-word; overflow-wrap: break-word;
+}
+.rb ul { list-style: none; padding: 0; margin: 0; }
+.rb ul li {
+  padding: 5px 0; display: flex;
+  align-items: flex-start; gap: 8px;
+  font-size: .86rem; line-height: 1.8;
+  color: rgba(255,255,255,.75);
+}
+
+/* res-name overflow fix */
+.res-name {
+  font-size: clamp(1.2rem, 5vw, 1.5rem);
+  font-weight: 900; margin-bottom: 3px;
+  line-height: 1.2; word-break: break-word;
+}
+
+/* res-catch */
+.res-catch {
+  font-size: clamp(.82rem, 3vw, .92rem);
+  font-weight: 700; color: rgba(255,255,255,.7);
+  margin-bottom: 14px; line-height: 1.7;
+  font-style: italic;
+}
+
+/* scene-world */
+.scene-world {
+  font-size: .72rem; font-weight: 900;
+  color: rgba(232,132,58,.9);
+  letter-spacing: .08em; margin-bottom: 8px;
+  display: block;
+}
+.scene-world::before { content: '【'; }
+.scene-world::after  { content: '】'; }
+
+/* voice feature bars */
+.voice-feat-wrap {
+  border-radius: 16px; padding: 16px 18px;
+  margin-top: 0; margin-bottom: 24px;
+}
+.vf-label { font-size: .76rem; width: 64px; }
+
+/* radar */
+.radar-wrap { margin-bottom: 24px; border-radius: 16px; }
+
+/* share section */
+.share-sec { margin-top: 24px; }
+.sbtn { border-radius: 14px; font-size: .82rem; }
+
+/* credits */
+.credits-block { margin: 24px auto 0; }
+.legal-block   { margin: 12px auto 24px; }
+
+/* モバイル専用 */
+@media (max-width: 420px) {
+  .res-info { padding: 18px 14px 22px; }
+  .rb { padding: 14px 15px; margin-bottom: 20px; }
+  .rb p { font-size: .84rem; line-height: 1.8; }
+  .rb ul li { font-size: .82rem; }
+  .radar-canvas { max-width: 200px !important; }
+  .share-grid { gap: 8px; }
+  .sbtn { padding: 11px 10px; font-size: .76rem; }
+  .credits-block { padding: 12px 16px; }
+  .credit-row { flex-direction: column; gap: 2px; }
+  .credit-label { min-width: unset; }
+}
 </style>
 </head>
 <body>
-<div class="fixed-copy">© nanoca.inc</div>
+<div class="fixed-copy">© nanoca Inc.</div>
 
 <!-- ===== HERO ===== -->
 <section class="hero" id="hero">
@@ -881,8 +1004,8 @@ body{font-family:'Zen Maru Gothic','Noto Sans JP',sans-serif;background:#0E0818;
   <div class="logo-bar">
     <div class="logo-icon">🎙️</div>
     <div>
-      <div class="logo-text">コエトワ</div>
-      <div class="logo-sub">KOETOWA VOICE LAB</div>
+      <div class="logo-text" style="font-size:1.4rem;letter-spacing:.08em;">nanoca Inc.</div>
+      <div class="logo-sub" style="letter-spacing:.1em;">7色声キャラ診断™</div>
     </div>
   </div>
 
@@ -914,7 +1037,7 @@ body{font-family:'Zen Maru Gothic','Noto Sans JP',sans-serif;background:#0E0818;
       <div class="cdot"></div><div class="cdot"></div><div class="cdot"></div>
       <div class="cdot"></div><div class="cdot"></div><div class="cdot"></div><div class="cdot"></div>
     </div>
-    <div class="cta-sub">全10問 ・ 約2〜3分</div>
+    <div class="cta-sub">🎙️ 声を録音して診断 ・ 約1分 ・ 約2〜3分</div>
   </div>
 </section>
 
@@ -1037,7 +1160,7 @@ body{font-family:'Zen Maru Gothic','Noto Sans JP',sans-serif;background:#0E0818;
 <div class="result-sec" id="result-sec">
   <div class="result-inner">
     <div class="low-var-msg" id="low-var-msg">
-      🎙️ 録音した声の特徴から判定しました。話し方や状況によって結果が変化することがあります。
+      🎙️ 今回の診断は、録音したあなた自身の声を中心に解析しています。声の高さ・明るさ・話し方の特徴をもとに判定しました。話す状況によって結果が変化することがあります。
     </div>
     <div class="res-card">
       <div class="char-area">
@@ -1049,7 +1172,7 @@ body{font-family:'Zen Maru Gothic','Noto Sans JP',sans-serif;background:#0E0818;
         <div class="char-sprite" id="char-sprite"></div>
       </div>
       <div class="res-info">
-                <div class="voice-badge" id="voice-badge" style="display:none">🎤 音声解析スコアを反映済み</div>
+                <div class="voice-badge" id="voice-badge" style="display:none">🎤 あなたの声を解析して判定しました</div>
         <div class="color-bar" id="color-bar"></div>
         <div class="res-name" id="res-name"></div>
         <div class="res-en" id="res-en"></div>
@@ -1088,17 +1211,17 @@ body{font-family:'Zen Maru Gothic','Noto Sans JP',sans-serif;background:#0E0818;
         <!-- ① 第一印象 -->
         <div class="rb rb-str"><div class="lbl">✨ あなたの第一印象</div><p id="res-firstimp"></p></div>
         <!-- ② 声の特徴 -->
-        <div class="rb rb-sci" style="margin-top:10px"><div class="lbl">🎙️ 声の特徴</div><p id="res-feat"></p></div>
-        <!-- ③ 声のヒミツ -->
-        <div class="rb rb-act" style="margin-top:10px"><div class="lbl">💎 声のヒミツ</div><p id="res-secret"></p></div>
+        <div class="rb rb-sci"><div class="lbl">🎙️ 声の特徴</div><p id="res-feat"></p></div>
+        <!-- ③ 声のヒミツ（科学的視点 翻訳版）-->
+        <div class="rb rb-act"><div class="lbl">🔬 科学的視点</div><p id="res-secret"></p></div>
         <!-- ④ 活躍シーン（ランダム生成） -->
-        <div class="rb rb-sce" style="margin-top:10px">
+        <div class="rb rb-sce">
           <div class="lbl">🗺️ 活躍シーン</div>
           <div class="scene-world" id="res-scene-world"></div>
           <p id="res-sce"></p>
           <button class="scene-refresh-btn" id="scene-refresh" onclick="refreshScene()">✦ 別のシーンを見る</button>
         </div>
-        <!-- 向いている活動 -->
+                <!-- 向いている活動 -->
         <div class="rb rb-str" style="margin-top:10px"><div class="lbl">🎯 活躍できる場所</div><ul id="res-act"></ul></div>
         <!-- ⑤ 伸ばすヒント -->
         <div class="rb rb-adv" style="margin-top:10px"><div class="lbl">📈 声を伸ばすヒント</div><p id="res-adv"></p></div>
@@ -1115,11 +1238,43 @@ body{font-family:'Zen Maru Gothic','Noto Sans JP',sans-serif;background:#0E0818;
     <button class="retry-btn" onclick="restart()">🔄 もう一度診断する</button>
   </div>
   <div class="tagline">声よ、永遠に。</div>
-  <div class="copy">© nanoca.inc</div>
+  <div class="credits-block">
+    <div class="credit-row"><span class="credit-label">企画・開発</span><span class="credit-val">nanoca Inc.</span></div>
+    <div class="credit-row"><span class="credit-label">Research Partner</span><span class="credit-val">コエトワ Voice Lab</span></div>
+    <div class="credit-row"><span class="credit-label">Scientific Supervision</span><span class="credit-val">林大輔</span></div>
+  </div>
+  <div class="legal-block">
+    <p>© nanoca Inc.</p>
+    <p>7色声キャラ診断™ は nanoca Inc. が企画・開発したオリジナルコンテンツです。</p>
+    <p>無断転載・複製・商用利用・再配布を禁止します。</p>
+    <p>共同利用・導入・ライセンス利用をご希望の場合は<br>shiho.oura0707@gmail.com までお問い合わせください。</p>
+  </div>
 </div>
 <div class="toast" id="toast"></div>
 
-<script>var contextQuality = 0.7;
+<script>
+// ============================================================
+// IP DATA — 声キャラ7色診断™ キャラクター定義
+// © nanoca Inc. — 将来のIP展開用内部データ
+// ============================================================
+var CHARACTER_IP_DATA = {
+  version: '1.0.0',
+  trademark: '7色声キャラ診断™',
+  owner: 'nanoca Inc.',
+  researchPartner: 'コエトワ Voice Lab',
+  supervision: '林大輔',
+  characters: [
+    {id:'red',   name:'赤のリーダーボイス',   voiceAxis:{f0:'mid-low',sc:'high',ap:'low',tilt:'mid'},   compat:['orange','indigo'], growth:'guardian'},
+    {id:'orange',name:'橙のガーディアンボイス',voiceAxis:{f0:'low',   sc:'mid', ap:'low',tilt:'high'},  compat:['green','red'],    growth:'charisma'},
+    {id:'yellow',name:'黄のスカウトボイス',    voiceAxis:{f0:'high',  sc:'high',ap:'mid',tilt:'mid'},   compat:['indigo','red'],   growth:'charisma'},
+    {id:'green', name:'緑のヒーラーボイス',    voiceAxis:{f0:'mid',   sc:'mid', ap:'high',tilt:'high'}, compat:['orange','purple'],growth:'mystic'},
+    {id:'blue',  name:'青のミステリアスボイス',voiceAxis:{f0:'low',   sc:'low', ap:'high',tilt:'low'},  compat:['indigo','purple'],growth:'charisma'},
+    {id:'purple',name:'紫のカリスマボイス',    voiceAxis:{f0:'mid',   sc:'high',ap:'mid',tilt:'mid'},   compat:['red','blue'],     growth:'legendary'},
+    {id:'indigo',name:'藍のトリックボイス',    voiceAxis:{f0:'var',   sc:'high',ap:'mid',tilt:'var'},   compat:['yellow','blue'],  growth:'transcendent'}
+  ]
+};
+
+var contextQuality = 0.7;
 var contextMultiplier = 1.0;
 
 // ============================================================
@@ -1218,6 +1373,17 @@ var RESULTS = [
       {world:'竜騎士の訓練場', txt:'若い騎士たちが失敗を恐れている中、あなたの声が「大丈夫だ」と伝えた。訓練の空気が変わり、皆が思い切りよく挑戦し始めた。'},
       {world:'海底神殿', txt:'水圧と暗闇の中で迷子になった仲間に、あなたの声が届いた。声の届く距離を超えたような気がした、不思議な響きだった。'},
       {world:'星降る草原', txt:'キャンプ地で議論が白熱する中、あなたが静かに話し始めた。声が場の熱を収め、全員が同じ星空を見上げる穏やかな夜になった。'}
+    ,
+      {world:'白銀の氷原', txt:'猛吹雪の中、あなたの声だけが仲間の進む方向を示した。声の届く先に、確かな道があった。'},
+      {world:'古代遺跡の祭壇', txt:'誰もが固まる中、あなたが最初に口を開いた。一言で場が動き、全員が行動を始めた。'},
+      {world:'海底都市の広場', txt:'水圧と闘いながら指示を出すあなたの声は揺れない。そのブレない声が、全員を安全地帯まで導いた。'},
+      {world:'空中騎士団の演習', txt:'訓練が失敗に終わりそうだったとき、あなたが声を上げた。リーダーシップが声に乗り、全員が立て直した。'},
+      {world:'最終決戦の前夜', txt:'誰もが沈黙する中、あなたが立ち上がって話した。その声が戦場に響き、仲間たちの目に闘志が宿った。'},
+      {world:'魔法都市の中枢', txt:'機械が暴走し始めたとき、あなたの指示が飛んだ。正確で力強い声が、混乱を制御した。'},
+      {world:'霧の湖の神殿', txt:'霧の向こうから声だけで仲間を誘導する。姿は見えなくても、声の確信が全員を正しい道へ連れた。'},
+      {world:'天空の審判台', txt:'神々の前で弁明するとき、あなたの声が揺れなかった。その声の強さが、審判を覆した。'},
+      {world:'砂漠の王国', txt:'砂嵐が来る前に全員を集めたのはあなたの声だった。その判断と声の力が、部隊を救った。'},
+      {world:'氷の迷宮', txt:'出口が見えない氷の迷宮で、あなたが声で仲間を集めた。声の響きが氷に反射し、正しい方向を示した。'}
     ],
     // 音声特性別サブロール
     subRoles:{
@@ -1259,6 +1425,17 @@ var RESULTS = [
       {world:'迷宮の最深部', txt:'全員が限界に近い中、あなたの声だけは変わらなかった。疲れを感じさせない声が、最後の力を引き出した。'},
       {world:'竜騎士の訓練場', txt:'若い騎士が失敗して落ち込んでいる。「もう一度だ」とあなたが言った。その声の温かさに、騎士は顔を上げた。'},
       {world:'満月の神殿', txt:'祈りの言葉を唱えるとき、あなたの声が夜空に溶けていく。神聖な空気が広がり、その場にいた全員が静かな気持ちになった。'}
+    ,
+      {world:'嵐の灯台', txt:'嵐の夜、灯台の光が消えた。あなたの声が代わりに響き渡り、船を岸へ導いた。'},
+      {world:'廃城の礼拝堂', txt:'長い間誰も訪れなかった礼拝堂で、あなたが静かに語りかけた。その声が壁に染み込み、場所が温かくなった。'},
+      {world:'雪原の修道院', txt:'厳しい冬でも修道士たちが倒れなかったのは、あなたの深い声が朝夕に読み上げる祈りのおかげだった。'},
+      {world:'深夜の砦', txt:'不眠の見張りに、あなたが静かに話しかけた。その声の重さが、兵士の意識をしっかりとつなぎ止めた。'},
+      {world:'遺跡の守護者', txt:'何百年も眠っていた守護神が、あなたの声を聞いて目を覚ました。声の格が、神に届いた。'},
+      {world:'竜の峡谷', txt:'反響する峡谷で、あなたの声だけが正確に届いた。声の安定感が、場所の特性を味方にした。'},
+      {world:'霧の港町', txt:'霧の中で道に迷う旅人に声をかけた。特別なことは何も言っていないのに、声の温かさが道を作った。'},
+      {world:'月明かりの草原', txt:'満月の夜に古い話を語り始めたとき、どこからともなく人が集まってきた。声が人を引き寄せた夜だった。'},
+      {world:'古代竜の墓所', txt:'入ってはいけない場所へ向かおうとする仲間を止めた。一言の重さが、全員の足を止めた。'},
+      {world:'水中都市の議場', txt:'意見が割れる議場で、あなたが最後に話した。声の重みが議論に終止符を打った。'}
     ],
     subRoles:{
       highClarity:'言葉で場を治める守護者',
@@ -1299,6 +1476,17 @@ var RESULTS = [
       {world:'地下鉱山', txt:'退屈な作業中にあなたが歌い始めた。声がトンネルに響き、気づけば全員で歌っていた。声が作業を楽しいものに変えた。'},
       {world:'蜃気楼の迷宮', txt:'同じ場所をぐるぐると回っているかもしれない。でもあなたの声は「面白くない？これ！」と笑っている。声の前向きさが呪いを弱めた。'},
       {world:'星空の観測所', txt:'難しい星の知識を、あなたが面白い話に変えて話してくれた。声の楽しさに引き込まれて、全員が夜明けまで話を聞いた。'}
+    ,
+      {world:'空中都市', txt:'落ちかけた地図をとっさに掴む。その裏に隠されたルートを見つけたのは、あなただった。'},
+      {world:'妖精市場', txt:'迷子になった仲間より先に、妖精たちと友達になっていた。'},
+      {world:'深海神殿', txt:'誰も気付かなかった光を見つけ、新しい道を開く。'},
+      {world:'夢の迷宮', txt:'誰もが怖くて進めない扉を、あなたが「面白そう！」と言って開けた。その先に宝があった。'},
+      {world:'時計仕掛けの城', txt:'複雑な機械の中に、遊び心で触れたら偶然正解した。声の楽しさが、謎を解いた。'},
+      {world:'雲の上の国', txt:'雲の国の住人が初めて人間に心を開いたのは、あなたの声の明るさのおかげだった。'},
+      {world:'色彩の森', txt:'色が消えた森を歩きながら、あなたが歌い始めた。声に合わせて色が戻っていった。'},
+      {world:'砂漠の幻影都市', txt:'蜃気楼だと思っていた都市が、あなたの声に反応して実体化した。'},
+      {world:'星の図書館', txt:'読めない星の言葉を、感覚で声に出してみたら扉が開いた。直感の声が正解だった。'},
+      {world:'二つの月がある夜', txt:'二つの月が出る夜に仲間が戸惑う中、あなたが「きれいだね！」と笑った。声が不安を吹き飛ばした。'}
     ],
     subRoles:{
       highClarity:'みんなを正しい道へ導くナビゲーター',
@@ -1339,6 +1527,17 @@ var RESULTS = [
       {world:'月光の修道院', txt:'深夜の修道院で一人悩む修道士に、あなたが声をかけた。答えではなく、声の温度だけで、修道士の表情が柔らかくなった。'},
       {world:'霧の中の村', txt:'病が流行る村で、あなたの声が一軒一軒を回った。薬よりも、人の声の温かさが村人たちの回復を助けた。'},
       {world:'滝の裏の洞窟', txt:'騒音から逃げてきた詩人が、静かに詩を書いていた。あなたが近くに座って静かに話しかけると、詩人は最高の一行を書き上げた。'}
+    ,
+      {world:'治癒の泉', txt:'枯れかけた泉のそばで、あなたが静かに歌った。声が水に溶け込み、泉が少しずつ戻り始めた。'},
+      {world:'古い病院跡', txt:'長い間苦しんでいた患者に声をかけた。薬でも魔法でもなく、声の温度が癒しになった。'},
+      {world:'精霊の庭', txt:'精霊に傷つけられた仲間に、あなたがそっと話しかけた。声の柔らかさに、精霊も謝りに来た。'},
+      {world:'雨の教会', txt:'一人で泣いていた子どもに声をかけると、知らない間に笑っていた。声が涙を晴れにした。'},
+      {world:'砂漠のオアシス', txt:'疲弊した旅人たちに水を渡しながら話しかけた。物より声の方が、旅人たちを回復させた。'},
+      {world:'秋の森の小屋', txt:'道に迷った老人を家まで送りながら話し続けた。声の温かさに、老人は涙が止まらなかったと言った。'},
+      {world:'廃村の井戸', txt:'呪われた水を前に、あなたが祈るように話しかけた。声の純粋さが、呪いを中和した。'},
+      {world:'月光の泉', txt:'月の光を浴びながら、あなたがそっと歌った。その声を聞いた仲間が、長年の悲しみを手放せた。'},
+      {world:'古代植物の神殿', txt:'枯れた神木に声をかけ続けた。三日目の朝、木が新しい葉を出した。'},
+      {world:'夜明けの砦', txt:'戦いが終わった後、誰も言葉を持てない中で、あなただけが静かに話し始めた。その声が夜を明けさせた。'}
     ],
     subRoles:{
       highClarity:'言葉で心を整える導き手',
@@ -1379,6 +1578,17 @@ var RESULTS = [
       {world:'時計仕掛けの城', txt:'精密な機械が並ぶ中で、あなたが静かに作業する。声に出さないことが多いが、必要なときだけ放つ一言の重みは格別だった。'},
       {world:'情報商人の隠れ家', txt:'大切な情報を渡すとき、あなたは声のトーンを変えた。その変化が、情報の重要さを相手に伝えた。'},
       {world:'夜明け前の砦', txt:'夜明け前の最も暗い時間に、あなたが静かに動き始める。誰も気づかないその声が、朝になって全員を救っていた。'}
+    ,
+      {world:'鏡の迷宮', txt:'自分の声の反響だけを頼りに出口を探す。あなたの声だけが迷宮の謎を解いた。'},
+      {world:'影の世界', txt:'光のない影の世界で、あなたの声だけが現実にある。その声が、仲間を現世につなぎとめた。'},
+      {world:'禁忌の図書館', txt:'誰も入れない禁書区画に、あなたは声一つで入った。声の独特さが、扉の認証を通過した。'},
+      {world:'月のない海', txt:'真夜中の海で一人航行するとき、あなたは独り言を言い続けた。声が自分の羅針盤になった。'},
+      {world:'時間が止まった街', txt:'呪いで時が止まった街で、あなたの声だけが動いた。声が呪いの隙間を見つけた。'},
+      {world:'地下競技場の決勝', txt:'試合前、誰も知らない場所で一人準備するあなた。その静かな声の呟きが、最高の集中を生んだ。'},
+      {world:'呪われた宝物庫', txt:'罠だらけの宝物庫を、声で確認しながら進む。その判断力が、一度も罠を踏まなかった。'},
+      {world:'異界の入り口', txt:'異界への扉は声でしか開かない。あなたの独特な声だけが、扉を認識した。'},
+      {world:'霜の王国', txt:'感情を持たない霜の王に、あなたが一言話しかけた。その声の温度に、王が初めて表情を変えた。'},
+      {world:'二重の月夜', txt:'二つの月が出る夜だけ現れる幻の城で、あなたの声が記録に刻まれた。声が歴史になった夜だった。'}
     ],
     subRoles:{
       highClarity:'精密な情報を持つ諜報員',
@@ -1419,6 +1629,17 @@ var RESULTS = [
       {world:'精霊会議', txt:'人間を認めない精霊たちの前で、あなたが話し始めた。声の格と深みに、精霊たちが耳を傾け始めた。'},
       {world:'夜明けの砦', txt:'長い戦いの後、勝利を告げる言葉を声に出した。その声が空気を震わせ、全員の心に届いた。'},
       {world:'古代の遺跡', txt:'誰も読めなかった碑文を解読したとき、あなたが声に出して読んだ。声に乗った言葉が、扉を開いた。'}
+    ,
+      {world:'天空の神殿', txt:'神に届く言葉を探していたとき、あなたが口を開いた。声の格が、神の耳に届いた。'},
+      {world:'幻の劇場', txt:'伝説の劇場で一人語りをするとき、消えた観客たちが戻ってきた。声が時間を超えた。'},
+      {world:'錬金術師の最終試験', txt:'最終試験は「声で物質を変容させよ」だった。あなたの声の深みが、試験を通過させた。'},
+      {world:'星の海原', txt:'星の間を航行するとき、あなたが星座の物語を語り始めた。全員が聴き入り、航路を忘れかけた。'},
+      {world:'封印された神獣の前', txt:'神獣の封印を解く言葉を誰も知らなかった。あなたが声に出した言葉が、偶然一致した。'},
+      {world:'古代王の幽霊', txt:'古代王の幽霊に話しかけたとき、あなたの声の格が王の興味を引いた。幽霊が静かに答えた。'},
+      {world:'虹の橋の向こう', txt:'死者の国への橋で、あなたが語りかけた。声の深みが守護者を説得し、仲間が戻ってきた。'},
+      {world:'霧の選択の間', txt:'どの扉が正解か誰も分からない。あなたが声に出して考えたとき、正しい扉が光った。'},
+      {world:'永遠の図書館', txt:'無限の本が並ぶ図書館で、あなたが一冊を声に出して読んだ。その声が、館全体を照らした。'},
+      {world:'龍の言語', txt:'竜の言葉は声紋で解読される。あなたの独特な声が、古代竜の遺言を読み解いた。'}
     ],
     subRoles:{
       highClarity:'言葉で世界を変える演説家',
@@ -1459,6 +1680,17 @@ var RESULTS = [
       {world:'時間の狭間', txt:'過去と未来が交差する場所で、あなたが声を使って時間を整えた。声の変化が、乱れた時間の流れを修復した。'},
       {world:'夜の神殿の祭儀', txt:'祭儀の中で声が求められたとき、あなたは参加者全員の声を真似て歌い上げた。その声の多様さに、神が喜んだと言われた。'},
       {world:'最後の決戦前夜', txt:'決戦前夜、緊張した仲間たちの前であなたが歌い始めた。笑ったり泣いたり、声が感情を揺さぶるたびに仲間の顔が変わっていった。'}
+    ,
+      {world:'声色の神殿', txt:'七つの感情を声だけで表現する神殿の試練。あなたは七つ全部を一息でやり遂げた。'},
+      {world:'多重世界の交差点', txt:'複数の世界が交差する場所で、各世界の言葉を使い分けた。声の多様さが、世界の橋渡しになった。'},
+      {world:'幻術師との勝負', txt:'幻術師が声で幻を作り出す勝負を挑んできた。あなたの多彩な声が幻術師を圧倒した。'},
+      {world:'演劇の女神の前', txt:'演劇の女神に全力を見せるとき、あなたは百の声を一人で演じた。女神が初めて拍手した。'},
+      {world:'記憶の回廊', txt:'誰かの記憶の中を歩くとき、その人の声を真似て話しかけた。扉が開き、大切な記憶が戻った。'},
+      {world:'音楽の神殿', txt:'楽器でも歌でもなく、声そのものが試される神殿。あなたの変幻自在な声が、神殿を制した。'},
+      {world:'時間の迷路', txt:'過去と未来が混在する迷路で、その時代の声を使い分けた。声が時代を超えた道標になった。'},
+      {world:'海賊王の裁判', txt:'海賊王の前で弁明するとき、あなたは次々と声を変えながら話した。海賊王が笑い出し、無罪になった。'},
+      {world:'月の言語学校', txt:'月の住人たちは音で会話する。あなたの声の多様さが、月の言語を習得させた。'},
+      {world:'最後の詩人', txt:'世界最後の詩人として声を残すとき、あなたは全ての感情を一つの声に込めた。その声が永遠に刻まれた。'}
     ],
     subRoles:{
       highClarity:'何役でも演じ分けるトップ声優',
@@ -1648,6 +1880,48 @@ function showAnalyzing() {
   setTimeout(showResult,3200);
 }
 
+
+// ============================================================
+// 科学的視点テキスト生成（一般語翻訳）
+// ============================================================
+function generateScienceText(vs, r) {
+  if (!vs) {
+    return r.voiceSecret || r.str || '';
+  }
+  var parts = [];
+
+  // F0 / ピッチ
+  if (vs.zcr > 0.6) {
+    parts.push('科学的な分析では、あなたの声は高さのある明るい音域を持っています。自然と人の注意を引きつけやすく、会話の中で存在感を発揮する声です。');
+  } else if (vs.zcr < 0.35) {
+    parts.push('科学的な分析では、あなたの声は落ち着いた低音域にあります。聞いている人に安心感と信頼感を与えやすく、どっしりとした印象を残す声です。');
+  } else {
+    parts.push('科学的な分析では、あなたの声は幅広い音域を持つバランスの良い声です。場面に応じて印象を使い分けられる、柔軟性の高い声です。');
+  }
+
+  // スペクトル重心 / 明るさ
+  if (vs.sc > 0.6) {
+    parts.push('声の明るさを示す指標が高く、声がはっきりと前に出る特性があります。騒がしい環境でも声が埋もれにくく、伝達力の高い声です。');
+  } else if (vs.sc < 0.35) {
+    parts.push('声の深みを示す指標が高く、落ち着きのある響きが特徴です。聞き手が自然とリラックスできる、包容力のある声です。');
+  }
+
+  // 非周期性 / 息感
+  if (vs.aperiod > 0.55) {
+    parts.push('声に独特の質感があり、「一度聴いたら忘れない」印象を残しやすい特性があります。この個性が、あなたの声を特別なものにしています。');
+  }
+
+  // 抑揚 / ダイナミクス
+  if (vs.infl > 0.55) {
+    parts.push('話し方のリズムと高低差が豊かで、聞いている人が内容に集中しやすい傾向があります。感情が声に自然と乗り、聞き手の心を動かします。');
+  } else if (vs.infl < 0.3) {
+    parts.push('一定のトーンで話す安定感があり、落ち着いた印象を与えます。感情に左右されない声の安定性が、信頼感を生み出します。');
+  }
+
+  if (parts.length === 0) return r.voiceSecret || r.str || '';
+  return parts.slice(0, 2).join(' ');
+}
+
 function showResult() {
   document.getElementById('analyzing').style.display='none';
   document.getElementById('result-sec').style.display='block';
@@ -1673,6 +1947,10 @@ function showResult() {
   // New result fields
   document.getElementById('res-firstimp').textContent = r.firstImpression || r.str || '';
   document.getElementById('res-feat').textContent = r.voiceFeature || r.sci || '';
+  // Generate science text based on voice features
+  var sciText = generateScienceText(voiceScore, r);
+  var sciEl = document.getElementById('res-secret');
+  if (sciEl) sciEl.textContent = sciText;
   document.getElementById('res-secret').textContent = r.voiceSecret || r.str || '';
   document.getElementById('res-adv').textContent = r.adv || '';
 
