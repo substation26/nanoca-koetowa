@@ -770,6 +770,76 @@ body{font-family:'Zen Maru Gothic','Noto Sans JP',sans-serif;background:#0E0818;
   font-size: .7rem; font-weight: 900;
   color: #C89AFF; margin-bottom: 12px;
 }
+
+/* ===== CONTEXT OPTION BUTTONS ===== */
+.q-opts { display: flex; flex-direction: column; gap: 8px; }
+.opt-btn {
+  width: 100%; padding: 12px 16px; border-radius: 14px;
+  border: 1.5px solid rgba(255,255,255,.1);
+  background: rgba(255,255,255,.04);
+  font-family: inherit; font-size: .88rem; font-weight: 700;
+  color: rgba(255,255,255,.7); cursor: pointer; text-align: left;
+  transition: all .18s cubic-bezier(.34,1.3,.64,1);
+  display: flex; align-items: center; gap: 10px;
+}
+.opt-btn:hover {
+  border-color: rgba(155,110,212,.5);
+  background: rgba(155,110,212,.12);
+  color: #C89AFF; transform: translateX(4px);
+}
+.opt-btn.sel {
+  border-color: #9B6ED4;
+  background: linear-gradient(135deg, rgba(155,110,212,.3), rgba(90,106,212,.2));
+  color: #fff; transform: translateX(6px);
+  box-shadow: 0 4px 16px rgba(155,110,212,.3);
+}
+.opt-num {
+  width: 24px; height: 24px; border-radius: 50%;
+  background: rgba(155,110,212,.2); border: 1px solid rgba(155,110,212,.4);
+  display: flex; align-items: center; justify-content: center;
+  font-size: .65rem; font-weight: 900; color: rgba(155,110,212,.8);
+  flex-shrink: 0;
+}
+.opt-btn.sel .opt-num {
+  background: #9B6ED4; border-color: #9B6ED4; color: #fff;
+}
+
+/* ===== VOICE FEATURE BARS ===== */
+.voice-feat-wrap {
+  background: rgba(255,255,255,.03);
+  border: 1px solid rgba(155,110,212,.2);
+  border-radius: 14px; padding: 14px 16px;
+  margin-top: 10px;
+}
+.vf-title {
+  font-size: .62rem; font-weight: 900; color: rgba(155,110,212,.8);
+  letter-spacing: .12em; margin-bottom: 12px;
+}
+.vf-row {
+  display: flex; align-items: center; gap: 8px;
+  margin-bottom: 9px;
+}
+.vf-label {
+  font-size: .72rem; font-weight: 700; color: rgba(255,255,255,.6);
+  width: 60px; flex-shrink: 0;
+}
+.vf-bar-track {
+  flex: 1; height: 8px; background: rgba(255,255,255,.06);
+  border-radius: 10px; overflow: hidden;
+}
+.vf-bar-fill {
+  height: 100%; border-radius: 10px; width: 0%;
+  background: linear-gradient(90deg,#4A7AC8,#9B6ED4);
+  transition: width .8s cubic-bezier(.4,0,.2,1);
+}
+.vf-val {
+  font-size: .7rem; font-weight: 900; color: rgba(255,255,255,.5);
+  width: 30px; text-align: right; flex-shrink: 0;
+}
+.vf-note {
+  font-size: .68rem; color: rgba(255,255,255,.35);
+  margin-top: 8px; line-height: 1.6; font-style: italic;
+}
 </style>
 </head>
 <body>
@@ -924,18 +994,7 @@ body{font-family:'Zen Maru Gothic','Noto Sans JP',sans-serif;background:#0E0818;
         <div class="q-param" id="q-param-lbl">声の通り</div>
       </div>
       <div class="q-txt" id="q-txt"></div>
-      <div class="likert-labels">
-        <div class="ll">まったく<br>ない</div><div class="ll">あまり<br>ない</div>
-        <div class="ll">どちら<br>とも</div><div class="ll">よく<br>ある</div>
-        <div class="ll">非常に<br>よくある</div>
-      </div>
-      <div class="likert-btns" id="likert-btns">
-        <button class="lb" onclick="selL(1)">1</button>
-        <button class="lb" onclick="selL(2)">2</button>
-        <button class="lb" onclick="selL(3)">3</button>
-        <button class="lb" onclick="selL(4)">4</button>
-        <button class="lb" onclick="selL(5)">5</button>
-      </div>
+      <div class="q-opts" id="q-opts"></div>
     </div>
     <button class="nxt-btn" id="nxt-btn" onclick="nextQ()">つぎへ →</button>
   </div>
@@ -953,7 +1012,7 @@ body{font-family:'Zen Maru Gothic','Noto Sans JP',sans-serif;background:#0E0818;
 <div class="result-sec" id="result-sec">
   <div class="result-inner">
     <div class="low-var-msg" id="low-var-msg">
-      ⚠️ 回答のバラつきが少ないため、診断精度が下がっている可能性があります。実際の経験を思い出しながら、もう一度回答してみてください。
+      🎙️ 今回は録音音声を中心に判定しました。録音条件によって結果が変化する場合があります。
     </div>
     <div class="res-card">
       <div class="char-area">
@@ -974,6 +1033,32 @@ body{font-family:'Zen Maru Gothic','Noto Sans JP',sans-serif;background:#0E0818;
         <div class="radar-wrap">
           <div class="radar-ttl">🔊 あなたの声の特性マップ</div>
           <canvas id="radarChart" width="240" height="240" style="width:100%;max-width:240px;display:block;margin:0 auto;"></canvas>
+        </div>
+
+        <!-- Voice Feature Bars -->
+        <div class="voice-feat-wrap" id="voice-feat-wrap" style="display:none">
+          <div class="vf-title">✦ あなたの声の特徴（音声解析結果）</div>
+          <div class="vf-row">
+            <div class="vf-label">🌡️ 温かさ</div>
+            <div class="vf-bar-track"><div class="vf-bar-fill" id="vf-warmth"></div></div>
+            <div class="vf-val" id="vf-warmth-val">--</div>
+          </div>
+          <div class="vf-row">
+            <div class="vf-label">✨ 明瞭さ</div>
+            <div class="vf-bar-track"><div class="vf-bar-fill" id="vf-clarity"></div></div>
+            <div class="vf-val" id="vf-clarity-val">--</div>
+          </div>
+          <div class="vf-row">
+            <div class="vf-label">🌸 可愛さ</div>
+            <div class="vf-bar-track"><div class="vf-bar-fill" id="vf-cute"></div></div>
+            <div class="vf-val" id="vf-cute-val">--</div>
+          </div>
+          <div class="vf-row">
+            <div class="vf-label">💎 独特さ</div>
+            <div class="vf-bar-track"><div class="vf-bar-fill" id="vf-unique"></div></div>
+            <div class="vf-val" id="vf-unique-val">--</div>
+          </div>
+          <div class="vf-note" id="vf-note"></div>
         </div>
         <div class="rb rb-str"><div class="lbl">💪 声の強み</div><p id="res-str"></p></div>
         <div class="rb rb-sce"><div class="lbl">🎬 活躍シーン</div><p id="res-sce"></p></div>
@@ -998,6 +1083,7 @@ body{font-family:'Zen Maru Gothic','Noto Sans JP',sans-serif;background:#0E0818;
 <div class="toast" id="toast"></div>
 
 <script>var contextQuality = 0.7;
+var contextMultiplier = 1.0;
 
 // ============================================================
 // HERO EFFECTS
@@ -1037,9 +1123,28 @@ function startDiag() {
 // QUIZ DATA
 // ============================================================
 var QS = [
-  {param:'録音状況', txt:'今の録音は、普段の自分の声に近いと思いますか？', rev:false},
-  {param:'発声状況', txt:'リラックスした状態で声を出すことができましたか？', rev:false},
-  {param:'環境状況', txt:'静かな環境で録音できましたか？（周囲の雑音は少なかった）', rev:false}
+  {
+    param:'声のコンテキスト',
+    txt:'今の録音はどんな場面の声に近いですか？',
+    opts:['ひとりで話している時','友人と話している時','仕事・学校で話す時','配信や発表の時','演技や歌唱に近い'],
+    // 1=private/relaxed → breathiness高め補正, 5=performance → clarity高め補正
+    // contextScore: 1→warm, 3→neutral, 5→clear
+    contextMap:[0.8, 0.9, 1.0, 1.1, 1.2]
+  },
+  {
+    param:'声の自然さ',
+    txt:'今の声はどのくらい自然な状態ですか？',
+    opts:['かなり作っている','少し作っている','どちらともいえない','ほぼ自然','完全に自然'],
+    // naturalScore: high=trust voice data more
+    naturalMap:[0.5, 0.7, 0.85, 0.95, 1.0]
+  },
+  {
+    param:'録音環境',
+    txt:'録音環境はどうでしたか？',
+    opts:['かなり騒がしい','やや騒がしい','普通','静か','とても静か'],
+    // envScore: high=trust voice data more
+    envMap:[0.5, 0.7, 0.85, 0.95, 1.0]
+  }
 ];
 var RESULTS = [
   {sc:'rs-0',name:'赤のリーダーボイス',en:'Red Leader Voice',catch:'混沌の中でも届く、指揮官の声',role:'⚔️ 前衛リーダー（勇者・騎士）',c1:'#E85252',c2:'#F5A060',lb:'#E85252',pb:'rgba(232,82,82,.2)',pc:'#FF9999',str:'声帯の閉鎖力が高く、騒音下でも声が通ります。明瞭な子音と安定した発声が、あなたの声を群衆の中でも際立たせます。',sce:'乱戦の中で仲間に指示を飛ばす場面。混沌とした戦場でもあなたの声は埋もれることなく皆の耳に届き、士気を高めます。',sci:'高いHNR（高調波対雑音比）と安定した声帯閉鎖が、雑音下での声の通達性を高めています。声道共鳴のエネルギーが前方に集中しているため物理的に聞き取りやすい声です。',act:['MC・司会・プレゼンター','営業・交渉・コーチング','ポッドキャストホスト','スポーツ実況・アナウンス'],adv:'腹式呼吸のトレーニングで声量の持続性をさらに高めましょう。意図的な抑揚をつける練習が説得力を増します。',proto:[4.5,4.0,2.0,2.5,4.2,4.0,4.0,3.5]},
@@ -1055,14 +1160,20 @@ var RADAR_LABELS = ['明瞭さ','温かさ','独特さ','息感','可愛さ','�
 var cQ=0, ans=[0,0,0], selVal=0, curRes=null, fvec=[3,3,3,3,3,3,3,3];
 
 function extractFeatures(a) {
-  // a[0..2]: context correction questions (録音状況, リラックス度, 環境)
-  // All forward scored (high = good recording condition)
-  var recQuality = (a[0] + a[1] + a[2]) / 15.0; // 0-1, quality of recording context
-  // Context correction multiplier: if recording was poor, reduce voice weight slightly
-  // This is stored for use in classify()
-  contextQuality = recQuality;
-  // Return a minimal fvec (voice data will dominate in classify)
-  // We still return 8 elements for radar compat but these are now LOW weight
+  // a[0..2]: option indices (0-4) for context/naturalness/environment questions
+  var contextIdx = (a[0] || 1) - 1;  // 0-4: voice context (0=private, 4=performance)
+  var naturalIdx  = (a[1] || 3) - 1; // 0-4: naturalness (4=fully natural)
+  var envIdx      = (a[2] || 3) - 1; // 0-4: environment (4=very quiet)
+
+  // Context multiplier: affects warmth/clarity balance
+  var ctxMap = [0.8, 0.9, 1.0, 1.1, 1.2];
+  contextMultiplier = ctxMap[contextIdx] || 1.0;
+
+  // Trust level: how much to trust voice data
+  var natMap = [0.5, 0.7, 0.85, 0.95, 1.0];
+  var envMap = [0.5, 0.7, 0.85, 0.95, 1.0];
+  contextQuality = (natMap[naturalIdx] + envMap[envIdx]) / 2.0;
+
   return [3, 3, 3, 3, 3, 3, 3, 3]; // neutral baseline; voice will override
 }
 
@@ -1098,6 +1209,9 @@ function classify(fv) {
   }
   w  = blend(w,  0.5);
   cl = blend(cl, 0.5);
+  // Context multiplier: performance context → boost clarity; private → boost warmth
+  if (contextMultiplier > 1.0) { cl = Math.min(1, cl * contextMultiplier); }
+  else { w = Math.min(1, w / contextMultiplier); }
   cu = blend(cu, 0.5);
   un = blend(un, 0.5);
 
@@ -1174,19 +1288,31 @@ function renderQ() {
   document.getElementById('prog-bar').style.width=Math.round(cQ/QS.length*100)+'%';
   document.getElementById('prog-rem').textContent='あと '+(QS.length-cQ)+' 問';
   selVal=0;
-  var btns=document.querySelectorAll('.lb');
-  for(var i=0;i<btns.length;i++) btns[i].classList.remove('sel');
+  // Render option buttons
+  var optsEl=document.getElementById('q-opts');
+  optsEl.innerHTML='';
+  var labels=['A','B','C','D','E'];
+  for(var i=0;i<q.opts.length;i++){
+    (function(idx){
+      var btn=document.createElement('button');
+      btn.className='opt-btn';
+      btn.innerHTML='<span class="opt-num">'+labels[idx]+'</span>'+q.opts[idx];
+      btn.onclick=function(){
+        var all=document.querySelectorAll('.opt-btn');
+        for(var j=0;j<all.length;j++) all[j].classList.remove('sel');
+        btn.classList.add('sel');
+        selVal=idx+1; // 1-5
+        document.getElementById('nxt-btn').classList.add('vis');
+      };
+      optsEl.appendChild(btn);
+    })(i);
+  }
   document.getElementById('nxt-btn').classList.remove('vis');
   var card=document.getElementById('q-card');
   card.style.animation='none';card.offsetHeight;card.style.animation='fadeUp .42s cubic-bezier(.34,1.2,.64,1) both';
 }
 
-function selL(v) {
-  selVal=v;
-  var btns=document.querySelectorAll('.lb');
-  for(var i=0;i<btns.length;i++) btns[i].classList.toggle('sel',i===v-1);
-  document.getElementById('nxt-btn').classList.add('vis');
-}
+// selL replaced by opt-btn onclick
 
 function nextQ() {
   if(!selVal) return;
@@ -1640,6 +1766,29 @@ showResult = function() {
   // Voice-dominant: rebuild fvec from voice features (75%) + context correction (25%)
   if (voiceScore) {
     document.getElementById('voice-badge').style.display = 'inline-flex';
+    // Populate voice feature bars
+    var featWrap = document.getElementById('voice-feat-wrap');
+    if (featWrap) {
+      featWrap.style.display = 'block';
+      function setPct(id, valId, v) {
+        var pct = Math.round(v * 100);
+        var el = document.getElementById(id);
+        var vEl = document.getElementById(valId);
+        if (el) el.style.width = pct + '%';
+        if (vEl) vEl.textContent = pct + '%';
+      }
+      setPct('vf-warmth',  'vf-warmth-val',  voiceScore.warmth);
+      setPct('vf-clarity', 'vf-clarity-val', voiceScore.clarity);
+      setPct('vf-cute',    'vf-cute-val',    voiceScore.cute);
+      setPct('vf-unique',  'vf-unique-val',  voiceScore.unique);
+      // Context note
+      var ctxLabels = ['プライベートな声', '友人との声', '日常会話の声', '発表・配信の声', 'パフォーマンスの声'];
+      var ctxIdx = (ans[0] || 1) - 1;
+      var natLabels = ['', '', '', '', '完全に自然な状態'];
+      var natNote = (ans[1] || 1) >= 4 ? ' ／ ' + natLabels[4] : '';
+      var note = document.getElementById('vf-note');
+      if (note) note.textContent = '解析コンテキスト：' + (ctxLabels[ctxIdx] || '通常') + natNote;
+    }
     var w  = voiceScore.warmth;
     var cl = voiceScore.clarity;
     var cu = voiceScore.cute;
@@ -1693,7 +1842,7 @@ restart = function() {
   document.getElementById('rec-dot-1').classList.add('active');
   document.getElementById('rec-dot-2').classList.remove('active');
   document.getElementById('rec-dot-3').classList.remove('active');
-  document.getElementById('voice-badge').style.display = 'none';
+  document.getElementById('voice-badge').style.display = 'none'; var vfw=document.getElementById('voice-feat-wrap'); if(vfw) vfw.style.display='none';
   var errEl = document.getElementById('rec-error-box'); if(errEl){errEl.style.display='none';errEl.textContent='';}
   document.getElementById('recorder-section').classList.remove('show');
   _origRestart();
