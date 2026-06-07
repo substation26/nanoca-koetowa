@@ -531,7 +531,7 @@ body{font-family:'Zen Maru Gothic','Noto Sans JP',sans-serif;background:#0E0818;
   height: 1px;
   background: linear-gradient(90deg,transparent,rgba(155,110,212,.5),transparent);
 }
-.recorder-section.show { display: block; }
+.recorder-section.show { display: block !important; }
 .rec-inner { max-width: 560px; margin: 0 auto; }
 
 /* Step indicator */
@@ -1312,7 +1312,8 @@ function showRecorder() {
 
 function skipRecording() {
   voiceScore = null;
-  document.getElementById('recorder-section').classList.remove('show');
+  var rec = document.getElementById('recorder-section');
+  if (rec) { rec.style.display = 'none'; rec.classList.remove('show'); }
   document.getElementById('quiz-wrap').style.display = 'block';
   window.scrollTo({top: 0, behavior: 'smooth'});
   renderQ();
@@ -1615,7 +1616,8 @@ function computeVoiceFeatures(buffer) {
   setTimeout(function() { finishAnalysis(); }, 3400);
 }
 function finishAnalysis() {
-  document.getElementById('recorder-section').classList.remove('show');
+  var rec = document.getElementById('recorder-section');
+  if (rec) { rec.style.display = 'none'; rec.classList.remove('show'); }
   document.getElementById('quiz-wrap').style.display = 'block';
   window.scrollTo({top: 0, behavior: 'smooth'});
   renderQ();
@@ -1624,8 +1626,10 @@ function finishAnalysis() {
 // Override startDiag to go to recorder first
 var _origStartDiag = startDiag;
 startDiag = function() {
-  document.getElementById('hero').style.display = 'none';
-  document.getElementById('recorder-section').classList.add('show');
+  var hero = document.getElementById('hero');
+  var rec = document.getElementById('recorder-section');
+  if (hero) hero.style.display = 'none';
+  if (rec) { rec.style.display = 'block'; rec.classList.add('show'); }
   window.scrollTo({top: 0, behavior: 'smooth'});
 };
 
