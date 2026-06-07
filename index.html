@@ -867,36 +867,37 @@ body{font-family:'Zen Maru Gothic','Noto Sans JP',sans-serif;background:#0E0818;
 }
 
 /* ===== CREDITS & LEGAL ===== */
+/* === CREDITS (endroll style) === */
 .credits-block {
-  max-width: 600px; margin: 20px auto 0;
-  display: flex; flex-direction: column; gap: 6px;
-  padding: 14px 20px;
-  background: rgba(255,255,255,.03);
-  border: 1px solid rgba(255,255,255,.07);
-  border-radius: 12px;
+  max-width: 600px; margin: 28px auto 0;
+  padding: 0 20px;
 }
-.credit-row {
-  display: flex; align-items: center; gap: 12px;
-  font-size: .65rem;
+.credit-endroll {
+  display: flex; justify-content: center; align-items: flex-start;
+  gap: 0; flex-wrap: wrap;
 }
+.credit-col {
+  display: flex; flex-direction: column; align-items: center;
+  padding: 0 18px;
+  border-right: 1px solid rgba(255,255,255,.08);
+}
+.credit-col:last-child { border-right: none; }
 .credit-label {
-  color: rgba(255,255,255,.3); font-weight: 700;
-  letter-spacing: .08em; min-width: 130px; flex-shrink: 0;
+  font-size: .55rem; font-weight: 700;
+  color: rgba(255,255,255,.28); letter-spacing: .1em;
+  margin-bottom: 4px; white-space: nowrap;
 }
 .credit-val {
-  color: rgba(255,255,255,.55); font-weight: 700;
+  font-size: .72rem; font-weight: 700;
+  color: rgba(255,255,255,.5); white-space: nowrap;
 }
 .legal-block {
-  max-width: 600px; margin: 12px auto 0;
-  padding: 12px 20px;
-  text-align: center;
+  max-width: 600px; margin: 14px auto 0;
+  padding: 0 20px; text-align: center;
 }
 .legal-block p {
   font-size: .6rem; color: rgba(255,255,255,.2);
   line-height: 1.8; margin: 0;
-}
-.legal-block p:first-child {
-  color: rgba(255,255,255,.3); font-weight: 700; margin-bottom: 4px;
 }
 
 /* ===== MOBILE POLISH ===== */
@@ -1004,8 +1005,8 @@ body{font-family:'Zen Maru Gothic','Noto Sans JP',sans-serif;background:#0E0818;
   <div class="logo-bar">
     <div class="logo-icon">🎙️</div>
     <div>
-      <div class="logo-text" style="font-size:1.4rem;letter-spacing:.08em;">nanoca Inc.</div>
-      <div class="logo-sub" style="letter-spacing:.1em;">7色声キャラ診断™</div>
+      <div class="logo-text">コエトワ <span style="opacity:.5;font-size:.75em;font-weight:700;letter-spacing:.05em">× nanoca Inc.</span></div>
+      <div class="logo-sub">KOETOWA VOICE LAB</div>
     </div>
   </div>
 
@@ -1037,7 +1038,7 @@ body{font-family:'Zen Maru Gothic','Noto Sans JP',sans-serif;background:#0E0818;
       <div class="cdot"></div><div class="cdot"></div><div class="cdot"></div>
       <div class="cdot"></div><div class="cdot"></div><div class="cdot"></div><div class="cdot"></div>
     </div>
-    <div class="cta-sub">🎙️ 声を録音して診断 ・ 約1分 ・ 約2〜3分</div>
+    <div class="cta-sub">🎙️ 録音＋3つの質問 ・ 約1分</div>
   </div>
 </section>
 
@@ -1160,7 +1161,7 @@ body{font-family:'Zen Maru Gothic','Noto Sans JP',sans-serif;background:#0E0818;
 <div class="result-sec" id="result-sec">
   <div class="result-inner">
     <div class="low-var-msg" id="low-var-msg">
-      🎙️ 今回の診断は、録音したあなた自身の声を中心に解析しています。声の高さ・明るさ・話し方の特徴をもとに判定しました。話す状況によって結果が変化することがあります。
+      🎙️ 今回の診断は、録音したあなた自身の声を中心に解析しています。声の高さ・明るさ・話し方の特徴をもとに判定しました。
     </div>
     <div class="res-card">
       <div class="char-area">
@@ -1172,7 +1173,7 @@ body{font-family:'Zen Maru Gothic','Noto Sans JP',sans-serif;background:#0E0818;
         <div class="char-sprite" id="char-sprite"></div>
       </div>
       <div class="res-info">
-                <div class="voice-badge" id="voice-badge" style="display:none">🎤 あなたの声を解析して判定しました</div>
+                <div class="voice-badge" id="voice-badge" style="display:none">🎤 録音した声を解析して判定しました</div>
         <div class="color-bar" id="color-bar"></div>
         <div class="res-name" id="res-name"></div>
         <div class="res-en" id="res-en"></div>
@@ -1239,15 +1240,23 @@ body{font-family:'Zen Maru Gothic','Noto Sans JP',sans-serif;background:#0E0818;
   </div>
   <div class="tagline">声よ、永遠に。</div>
   <div class="credits-block">
-    <div class="credit-row"><span class="credit-label">企画・開発</span><span class="credit-val">nanoca Inc.</span></div>
-    <div class="credit-row"><span class="credit-label">Research Partner</span><span class="credit-val">コエトワ Voice Lab</span></div>
-    <div class="credit-row"><span class="credit-label">Scientific Supervision</span><span class="credit-val">林大輔</span></div>
+    <div class="credit-endroll">
+      <div class="credit-col">
+        <span class="credit-label">企画・開発</span>
+        <span class="credit-val">nanoca Inc.</span>
+      </div>
+      <div class="credit-col">
+        <span class="credit-label">Research Partner</span>
+        <span class="credit-val">コエトワ Voice Lab</span>
+      </div>
+      <div class="credit-col">
+        <span class="credit-label">Scientific Supervision</span>
+        <span class="credit-val">林大輔</span>
+      </div>
+    </div>
   </div>
   <div class="legal-block">
-    <p>© nanoca Inc.</p>
-    <p>7色声キャラ診断™ は nanoca Inc. が企画・開発したオリジナルコンテンツです。</p>
-    <p>無断転載・複製・商用利用・再配布を禁止します。</p>
-    <p>共同利用・導入・ライセンス利用をご希望の場合は<br>shiho.oura0707@gmail.com までお問い合わせください。</p>
+    <p>© nanoca Inc. ／ 7色声キャラ診断™</p>
   </div>
 </div>
 <div class="toast" id="toast"></div>
