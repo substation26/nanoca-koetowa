@@ -989,6 +989,81 @@ body{font-family:'Zen Maru Gothic','Noto Sans JP',sans-serif;background:#0E0818;
   .credit-row { flex-direction: column; gap: 2px; }
   .credit-label { min-width: unset; }
 }
+
+/* ===== DEBUG PANEL ===== */
+.debug-panel {
+  display: none;
+  margin: 20px auto; max-width: 600px;
+  background: rgba(0,0,0,.6);
+  border: 1px solid rgba(155,110,212,.4);
+  border-radius: 14px; padding: 16px 18px;
+}
+.debug-panel.show { display: block; }
+.debug-title {
+  font-size: .65rem; font-weight: 900; color: #9B6ED4;
+  letter-spacing: .12em; margin-bottom: 12px;
+  display: flex; align-items: center; justify-content: space-between;
+}
+.debug-grid {
+  display: grid; grid-template-columns: 1fr 1fr;
+  gap: 8px; margin-bottom: 10px;
+}
+.debug-item {
+  background: rgba(255,255,255,.04);
+  border-radius: 8px; padding: 8px 10px;
+}
+.debug-key {
+  font-size: .55rem; color: rgba(255,255,255,.35);
+  font-weight: 700; letter-spacing: .08em; margin-bottom: 3px;
+}
+.debug-val {
+  font-size: .88rem; font-weight: 900; color: #C89AFF;
+  font-family: monospace;
+}
+.debug-bar-wrap {
+  margin-top: 3px; height: 4px;
+  background: rgba(255,255,255,.08); border-radius: 4px; overflow: hidden;
+}
+.debug-bar {
+  height: 100%; background: linear-gradient(90deg,#4A7AC8,#9B6ED4);
+  border-radius: 4px; width: 0%; transition: width .5s ease;
+}
+.debug-scores {
+  border-top: 1px solid rgba(255,255,255,.07);
+  padding-top: 10px; margin-top: 2px;
+}
+.debug-score-row {
+  display: flex; align-items: center; gap: 8px;
+  margin-bottom: 5px;
+}
+.debug-score-name {
+  font-size: .62rem; font-weight: 700; color: rgba(255,255,255,.4);
+  width: 80px; flex-shrink: 0;
+}
+.debug-score-bar-track {
+  flex: 1; height: 6px; background: rgba(255,255,255,.06);
+  border-radius: 4px; overflow: hidden;
+}
+.debug-score-bar { height: 100%; border-radius: 4px; transition: width .5s ease; }
+.debug-score-val {
+  font-size: .62rem; color: rgba(255,255,255,.4);
+  width: 36px; text-align: right; font-family: monospace;
+}
+.debug-winner {
+  margin-top: 8px; padding: 6px 10px;
+  background: rgba(155,110,212,.15);
+  border-radius: 8px; font-size: .72rem;
+  color: #C89AFF; font-weight: 700;
+}
+.debug-toggle-btn {
+  display: block; margin: 12px auto 0; width: 100%; max-width: 600px;
+  background: transparent; border: 1px solid rgba(255,255,255,.1);
+  border-radius: 40px; padding: 8px; font-family: inherit;
+  font-size: .68rem; font-weight: 700; color: rgba(255,255,255,.2);
+  cursor: pointer; letter-spacing: .08em;
+  transition: all .2s ease;
+}
+.debug-toggle-btn:hover { color: rgba(255,255,255,.4); border-color: rgba(255,255,255,.2); }
 </style>
 </head>
 <body>
@@ -1236,6 +1311,61 @@ body{font-family:'Zen Maru Gothic','Noto Sans JP',sans-serif;background:#0E0818;
         <button class="sbtn s-copy" id="copy-btn" onclick="copyResult()"><span>📋</span> 結果をコピー</button>
       </div>
     </div>
+    
+    <!-- Debug Panel -->
+    <button class="debug-toggle-btn" onclick="toggleDebug()">🔬 音声解析デバッグ情報を表示</button>
+    <div class="debug-panel" id="debug-panel">
+      <div class="debug-title">
+        <span>🔬 音声解析デバッグ</span>
+        <span id="debug-silent-warn" style="color:#E85252;display:none">⚠️ 音声がほぼ無音</span>
+      </div>
+      <div class="debug-grid">
+        <div class="debug-item">
+          <div class="debug-key">F0 (声の高さ) ZCR</div>
+          <div class="debug-val" id="dbg-zcr">--</div>
+          <div class="debug-bar-wrap"><div class="debug-bar" id="dbg-zcr-bar"></div></div>
+        </div>
+        <div class="debug-item">
+          <div class="debug-key">スペクトル重心 (明るさ)</div>
+          <div class="debug-val" id="dbg-sc">--</div>
+          <div class="debug-bar-wrap"><div class="debug-bar" id="dbg-sc-bar"></div></div>
+        </div>
+        <div class="debug-item">
+          <div class="debug-key">非周期性 (息感)</div>
+          <div class="debug-val" id="dbg-ap">--</div>
+          <div class="debug-bar-wrap"><div class="debug-bar" id="dbg-ap-bar"></div></div>
+        </div>
+        <div class="debug-item">
+          <div class="debug-key">スペクトル傾斜 (柔らかさ)</div>
+          <div class="debug-val" id="dbg-tilt">--</div>
+          <div class="debug-bar-wrap"><div class="debug-bar" id="dbg-tilt-bar"></div></div>
+        </div>
+        <div class="debug-item">
+          <div class="debug-key">抑揚変化 (Inflection)</div>
+          <div class="debug-val" id="dbg-infl">--</div>
+          <div class="debug-bar-wrap"><div class="debug-bar" id="dbg-infl-bar"></div></div>
+        </div>
+        <div class="debug-item">
+          <div class="debug-key">音量 (RMS)</div>
+          <div class="debug-val" id="dbg-rms">--</div>
+          <div class="debug-bar-wrap"><div class="debug-bar" id="dbg-rms-bar"></div></div>
+        </div>
+      </div>
+      <div class="debug-scores">
+        <div class="debug-key" style="margin-bottom:8px;font-size:.6rem">タイプ別スコア（高いほど一致）</div>
+        <div id="dbg-type-scores"></div>
+        <div class="debug-winner" id="dbg-winner"></div>
+      </div>
+      <div class="debug-scores" style="margin-top:10px">
+        <div class="debug-key" style="margin-bottom:6px;font-size:.6rem">4軸スコア</div>
+        <div id="dbg-axis-scores"></div>
+      </div>
+      <div style="margin-top:10px;font-size:.62rem;color:rgba(255,255,255,.25);line-height:1.6;">
+        録音するたびに数値が変わることを確認してください。<br>
+        数値が毎回同じ場合は音声解析が機能していません。
+      </div>
+    </div>
+
     <button class="retry-btn" onclick="restart()">🔄 もう一度診断する</button>
   </div>
   <div class="tagline">声よ、永遠に。</div>
@@ -1823,6 +1953,9 @@ function classify(fv) {
   // Poor recording quality lowers confidence
   if (contextQuality < 0.5) conf = Math.max(50, conf - 10);
 
+  console.log('[Classify] scores:', scores.map(function(s,i){return ['赤','橙','黄','緑','青','紫','藍'][i]+':'+s.toFixed(3);}));
+  console.log('[Classify] winner:', ['赤','橙','黄','緑','青','紫','藍'][maxIdx], 'conf:', conf, 'gap:', gap.toFixed(3));
+  console.log('[Classify] contextQuality:', contextQuality.toFixed(3), 'contextMultiplier:', contextMultiplier.toFixed(3));
   return {typeIdx: maxIdx, conf: conf, sd: gap};
 }
 
@@ -2249,136 +2382,128 @@ function computeVoiceFeatures(buffer) {
   var len = ch.length;
   var sr = buffer.sampleRate;
 
-  // === FEATURE 1: RMS (声の強さ / HNR proxy) ===
-  var rmsSum = 0;
-  for (var i = 0; i < len; i++) rmsSum += ch[i] * ch[i];
-  var rms = Math.sqrt(rmsSum / len);
-  // Normalize: typical voice RMS 0.01-0.15
-  var rmsNorm = Math.max(0, Math.min(1, (rms - 0.005) / 0.12));
+  // ── SAFETY: silent check ──
+  var totalE = 0;
+  for (var i = 0; i < len; i++) totalE += ch[i] * ch[i];
+  if (totalE < 0.0001) {
+    // Nearly silent – neutral score
+    voiceScore = {zcr:0.5,rms:0.05,sc:0.5,aperiod:0.5,tilt:0.5,infl:0.5,
+      warmth:0.5,clarity:0.5,cute:0.5,unique:0.5,pitch:3,inflection:3,_silent:true};
+    setTimeout(function(){finishAnalysis();}, 3400);
+    return;
+  }
 
-  // === FEATURE 2: Zero Crossing Rate → F0 proxy ===
+  // ── F1: RMS ──
+  var rms = Math.sqrt(totalE / len);
+  // Auto-scale: use actual rms as reference
+  var rmsNorm = Math.max(0, Math.min(1, rms / 0.15));
+
+  // ── F2: Zero Crossing Rate → F0 proxy ──
   var crossings = 0;
   for (var i = 1; i < len; i++) {
-    if ((ch[i] >= 0 && ch[i-1] < 0) || (ch[i] < 0 && ch[i-1] >= 0)) crossings++;
+    if ((ch[i] >= 0) !== (ch[i-1] >= 0)) crossings++;
   }
-  var zcr = crossings / len; // higher ZCR = higher pitch
-  // Typical speech ZCR: 0.01-0.08
-  var zcrNorm = Math.max(0, Math.min(1, (zcr - 0.008) / 0.06));
+  var zcr = crossings / len;
+  // Typical speech: 0.01 (low voice) to 0.12 (high/noise)
+  // Normalize to 0-1 linearly within that range
+  var zcrNorm = Math.max(0, Math.min(1, (zcr - 0.01) / 0.10));
 
-  // === FEATURE 3: Spectral Centroid proxy (brightness) ===
-  // Use windowed FFT approach with simple frequency weighting
-  var fftSize = 512;
-  var numFrames = Math.floor(len / fftSize);
-  var spectralSum = 0, energySum = 0;
-  for (var f = 0; f < numFrames; f++) {
-    var offset = f * fftSize;
-    // Simple DFT for low-frequency bins (approximate)
-    for (var k = 1; k < 32; k++) {
-      var re = 0, im = 0;
-      for (var n = 0; n < Math.min(64, fftSize); n++) {
-        var angle = 2 * Math.PI * k * n / fftSize;
-        re += ch[offset + n] * Math.cos(angle);
-        im += ch[offset + n] * Math.sin(angle);
-      }
-      var mag = Math.sqrt(re*re + im*im);
-      spectralSum += k * mag;
-      energySum += mag;
+  // ── F3: Spectral Centroid via Web Audio AnalyserNode approach (FFT on downsampled) ──
+  // Use every 8th sample (downsample) for 64-point DFT on first 2s of audio
+  var useSamples = Math.min(len, sr * 2); // up to 2 seconds
+  var step = 8;
+  var N = Math.floor(useSamples / step);
+  var downsampled = new Float32Array(N);
+  for (var i = 0; i < N; i++) downsampled[i] = ch[i * step];
+  // DFT: compute magnitude spectrum (first N/2 bins)
+  var halfN = Math.floor(N / 2);
+  var mags = new Float32Array(halfN);
+  for (var k = 0; k < halfN; k++) {
+    var re = 0, im = 0;
+    for (var n = 0; n < N; n++) {
+      var angle = 2 * Math.PI * k * n / N;
+      re += downsampled[n] * Math.cos(angle);
+      im += downsampled[n] * Math.sin(angle);
     }
+    mags[k] = Math.sqrt(re*re + im*im);
   }
-  var spectralCentroid = energySum > 0 ? spectralSum / energySum : 0;
-  // Normalize centroid (typical range 2-20 bins)
-  var scNorm = Math.max(0, Math.min(1, (spectralCentroid - 2) / 16));
+  var wSum = 0, mSum = 0;
+  for (var k = 0; k < halfN; k++) { wSum += k * mags[k]; mSum += mags[k]; }
+  var sc = mSum > 0 ? wSum / mSum : halfN / 2;
+  // Normalize: low sc=0 (bass-heavy), high sc=1 (treble-heavy)
+  var scNorm = Math.max(0, Math.min(1, sc / halfN));
 
-  // === FEATURE 4: Aperiodicity proxy (breathiness / roughness) ===
-  // Measure local variance (jitter-like): difference between consecutive samples
-  var diffSum = 0;
-  for (var i = 1; i < len; i++) diffSum += Math.abs(ch[i] - ch[i-1]);
-  var avgDiff = diffSum / len;
-  // Normalize: higher = more aperiodic (breathy/rough)
-  var aperiodNorm = Math.max(0, Math.min(1, avgDiff / 0.08));
-
-  // === FEATURE 5: Spectral Tilt (声の鋭さ / 柔らかさ) ===
-  // Low-freq energy vs high-freq energy ratio
-  var windowSizeST = Math.floor(sr * 0.05); // 50ms
-  var lowEnergy = 0, highEnergy = 0;
-  var numWindows = Math.floor(len / windowSizeST);
-  for (var w = 0; w < numWindows; w++) {
-    var wOffset = w * windowSizeST;
-    for (var n = 0; n < windowSizeST; n++) {
-      var s = ch[wOffset + n];
-      if (n < windowSizeST / 2) lowEnergy += s * s;
-      else highEnergy += s * s;
-    }
+  // ── F4: Aperiodicity (consecutive sample diff variance) ──
+  var diffs = [];
+  var winAP = Math.floor(sr * 0.02); // 20ms windows
+  for (var w = 0; w + winAP < len; w += winAP) {
+    var dSum = 0;
+    for (var i = w+1; i < w+winAP; i++) dSum += Math.abs(ch[i]-ch[i-1]);
+    diffs.push(dSum / winAP);
   }
-  var tiltRatio = (lowEnergy + highEnergy) > 0 ? lowEnergy / (lowEnergy + highEnergy) : 0.5;
-  // tiltRatio near 1 = low-freq dominant (soft/gentle), near 0 = high-freq (sharp)
-  // Normalize: 0=sharp, 1=soft
-  var tiltNorm = Math.max(0, Math.min(1, (tiltRatio - 0.45) / 0.4));
+  var meanD = diffs.reduce(function(a,b){return a+b;},0) / diffs.length;
+  var varD = diffs.reduce(function(a,b){return a+Math.pow(b-meanD,2);},0) / diffs.length;
+  // meanD = average roughness (breathiness), varD = variance (periodicity stability)
+  // High meanD + high varD = rough/aperiodic; low = clean periodic
+  var aperiodNorm = Math.max(0, Math.min(1, (meanD * 5 + Math.sqrt(varD) * 3) / 2));
 
-  // === FEATURE 6: Dynamic Range / Inflection ===
-  // Variance of short-window RMS = prosodic variation
-  var winSize = Math.floor(sr * 0.1); // 100ms
+  // ── F5: Spectral Tilt (low/high energy ratio across frequency) ──
+  var lowE = 0, highE = 0;
+  var splitBin = Math.floor(halfN * 0.3); // split at 30% of spectrum
+  for (var k = 0; k < splitBin; k++) lowE += mags[k] * mags[k];
+  for (var k = splitBin; k < halfN; k++) highE += mags[k] * mags[k];
+  var tiltRatio = (lowE + highE) > 0 ? lowE / (lowE + highE) : 0.5;
+  // 1 = very low-freq dominant (soft), 0 = high-freq dominant (sharp/bright)
+  var tiltNorm = Math.max(0, Math.min(1, tiltRatio));
+
+  // ── F6: Inflection (RMS variance over 100ms windows) ──
+  var winSize = Math.floor(sr * 0.1);
   var winRms = [];
   for (var w = 0; w + winSize < len; w += winSize) {
     var s = 0;
-    for (var k = w; k < w + winSize; k++) s += ch[k] * ch[k];
+    for (var k = w; k < w+winSize; k++) s += ch[k]*ch[k];
     winRms.push(Math.sqrt(s / winSize));
   }
+  if (winRms.length < 2) winRms = [rms, rms * 1.1];
   var meanWR = winRms.reduce(function(a,b){return a+b;},0) / winRms.length;
-  var varWR = winRms.reduce(function(a,b){return a+Math.pow(b-meanWR,2);},0) / winRms.length;
-  var inflNorm = Math.max(0, Math.min(1, Math.sqrt(varWR) / 0.04));
+  var varWR  = winRms.reduce(function(a,b){return a+Math.pow(b-meanWR,2);},0) / winRms.length;
+  var sdWR   = Math.sqrt(varWR);
+  // Normalize relative to mean (coefficient of variation)
+  var inflNorm = meanWR > 0 ? Math.max(0, Math.min(1, sdWR / meanWR)) : 0;
 
-  // ============================================================
-  // MAP FEATURES → 4-AXIS VOICE CHARACTER SCORES
-  // (林大輔 research framework: F0, spectral centroid, aperiodicity, spectral tilt)
-  // ============================================================
-  //
-  // 温かさ (Warmth): low F0 + high aperiodicity + high tilt (soft)
-  //   → gentle, safe, healing quality
-  var warmth = (1 - zcrNorm) * 0.35 + aperiodNorm * 0.35 + tiltNorm * 0.30;
+  // ── MAP → 4-AXIS (林大輔 framework) ──
+  // warmth:  low pitch + soft(tilt) + breathiness
+  var warmth  = (1 - zcrNorm)*0.35 + tiltNorm*0.35 + aperiodNorm*0.30;
+  // clarity: high brightness(sc) + high volume + periodic(low aperiod)
+  var clarity = scNorm*0.40 + rmsNorm*0.35 + (1-aperiodNorm)*0.25;
+  // cute:    high pitch + high inflection + bright
+  var cute    = zcrNorm*0.45 + inflNorm*0.35 + scNorm*0.20;
+  // unique:  aperiodic + extreme deviation from average profile
+  var dev     = Math.abs(zcrNorm-0.5)+Math.abs(scNorm-0.5)+Math.abs(tiltNorm-0.5);
+  var unique  = aperiodNorm*0.35 + Math.min(1,dev/0.8)*0.35 + inflNorm*0.30;
 
-  // 明瞭さ (Clarity): high spectral centroid + high RMS + low aperiodicity
-  //   → bright, crisp, easy to understand
-  var clarity = scNorm * 0.40 + rmsNorm * 0.35 + (1 - aperiodNorm) * 0.25;
+  function cl(v){return Math.max(0,Math.min(1,v));}
+  warmth=cl(warmth); clarity=cl(clarity); cute=cl(cute); unique=cl(unique);
 
-  // 可愛さ (Cuteness): high F0 + high inflection + high spectral centroid
-  //   → young, lively, approachable
-  var cute = zcrNorm * 0.40 + inflNorm * 0.35 + scNorm * 0.25;
-
-  // 独特さ (Uniqueness): high aperiodicity + extreme values (distance from average)
-  //   → memorable, distinctive, unusual
-  var avgness = Math.abs(zcrNorm - 0.5) + Math.abs(scNorm - 0.5) + Math.abs(tiltNorm - 0.5);
-  var unique = aperiodNorm * 0.40 + Math.min(1, avgness / 1.0) * 0.35 + inflNorm * 0.25;
-
-  // Clamp to 0-1
-  function cl01(v){ return Math.max(0, Math.min(1, v)); }
-  warmth  = cl01(warmth);
-  clarity = cl01(clarity);
-  cute    = cl01(cute);
-  unique  = cl01(unique);
-
-  // Convert to 1-5 scale for compatibility
-  function to5(v){ return Math.max(1, Math.min(5, 1 + v * 4)); }
+  function to5(v){return Math.max(1,Math.min(5,1+v*4));}
 
   voiceScore = {
-    // Raw normalized features
-    zcr: zcrNorm,          // F0 proxy (high=high pitch)
-    rms: rmsNorm,          // Volume/strength
-    sc: scNorm,            // Spectral centroid (brightness)
-    aperiod: aperiodNorm,  // Breathiness/roughness
-    tilt: tiltNorm,        // Spectral tilt (softness)
-    infl: inflNorm,        // Inflection/prosody variation
-    // 4-axis character scores (0-1)
-    warmth: warmth,
-    clarity: clarity,
-    cute: cute,
-    unique: unique,
-    // Legacy 1-5 scores for backward compat
-    pitch: to5(zcrNorm),
-    inflection: to5(inflNorm)
+    zcr: zcrNorm, rms: rmsNorm, sc: scNorm,
+    aperiod: aperiodNorm, tilt: tiltNorm, infl: inflNorm,
+    warmth: warmth, clarity: clarity, cute: cute, unique: unique,
+    pitch: to5(zcrNorm), inflection: to5(inflNorm),
+    _raw: {rms:rms, zcr:zcr, sc:sc, tilt:tiltRatio, aperiod:meanD, infl:sdWR/Math.max(meanWR,0.001)}
   };
 
-  setTimeout(function() { finishAnalysis(); }, 3400);
+  // ── DEBUG LOG ──
+  console.log('[VoiceScore RAW]', JSON.stringify(voiceScore._raw));
+  console.log('[VoiceScore NORM]', {zcr:zcrNorm.toFixed(3), rms:rmsNorm.toFixed(3),
+    sc:scNorm.toFixed(3), ap:aperiodNorm.toFixed(3),
+    tilt:tiltNorm.toFixed(3), infl:inflNorm.toFixed(3)});
+  console.log('[4-Axis]', {warmth:warmth.toFixed(3), clarity:clarity.toFixed(3),
+    cute:cute.toFixed(3), unique:unique.toFixed(3)});
+
+  setTimeout(function(){finishAnalysis();}, 3400);
 }
 function finishAnalysis() {
   var rec = document.getElementById('recorder-section');
@@ -2486,6 +2611,96 @@ restart = function() {
   document.getElementById('recorder-section').classList.remove('show');
   _origRestart();
 };
+
+
+// ============================================================
+// DEBUG PANEL
+// ============================================================
+var debugVisible = false;
+
+function toggleDebug() {
+  debugVisible = !debugVisible;
+  var panel = document.getElementById('debug-panel');
+  if (panel) panel.classList.toggle('show', debugVisible);
+  var btn = document.querySelector('.debug-toggle-btn');
+  if (btn) btn.textContent = debugVisible ? 'デバッグ情報を隠す' : 'デバッグ情報を表示';
+  if (debugVisible) populateDebugPanel();
+}
+
+function populateDebugPanel() {
+  if (!voiceScore) {
+    document.getElementById('dbg-winner').textContent = '音声データなし（スキップされました）';
+    return;
+  }
+  if (voiceScore._silent) {
+    var sw = document.getElementById('debug-silent-warn');
+    if (sw) sw.style.display = 'inline';
+  }
+  function setDbg(id, barId, val) {
+    var el = document.getElementById(id);
+    var bar = document.getElementById(barId);
+    if (el) el.textContent = (val * 100).toFixed(1) + '%';
+    if (bar) bar.style.width = (val * 100) + '%';
+  }
+  setDbg('dbg-zcr',  'dbg-zcr-bar',  voiceScore.zcr);
+  setDbg('dbg-sc',   'dbg-sc-bar',   voiceScore.sc);
+  setDbg('dbg-ap',   'dbg-ap-bar',   voiceScore.aperiod);
+  setDbg('dbg-tilt', 'dbg-tilt-bar', voiceScore.tilt);
+  setDbg('dbg-infl', 'dbg-infl-bar', voiceScore.infl);
+  setDbg('dbg-rms',  'dbg-rms-bar',  voiceScore.rms);
+  var bw = voiceScore.warmth, bcl = voiceScore.clarity;
+  var bcu = voiceScore.cute, bun = voiceScore.unique;
+  var zcr = voiceScore.zcr, sc = voiceScore.sc;
+  var ap = voiceScore.aperiod, ti = voiceScore.tilt, inf = voiceScore.infl;
+  var qc = contextQuality;
+  function blend(v,n){return v*qc+n*(1-qc);}
+  bw=blend(bw,0.5); bcl=blend(bcl,0.5); bcu=blend(bcu,0.5); bun=blend(bun,0.5);
+  if (contextMultiplier > 1.0) bcl = Math.min(1, bcl * contextMultiplier);
+  else bw = Math.min(1, bw / contextMultiplier);
+  var typeScores = [
+    bcl*0.40+bw*0.25+(1-bcu)*0.20+(1-bun)*0.15,
+    bw*0.40+(1-zcr)*0.30+ti*0.30,
+    bcu*0.40+bcl*0.30+inf*0.30,
+    bw*0.40+ap*0.35+(1-bcl)*0.25,
+    bun*0.40+ap*0.30+(1-bcl)*0.30,
+    (bcl+bw)*0.40+sc*0.30+(1-bcu)*0.30,
+    bun*0.35+inf*0.35+sc*0.30
+  ];
+  var typeNames  = ['赤・リーダー','橙・ガーディアン','黄・スカウト','緑・ヒーラー','青・ミステリアス','紫・カリスマ','藍・トリック'];
+  var typeColors = ['#E85252','#F5923A','#D4B020','#4AAA5E','#4A7AC8','#9B6ED4','#5A6AD4'];
+  var maxS = Math.max.apply(null, typeScores);
+  var winnerIdx = typeScores.indexOf(maxS);
+  var scoresEl = document.getElementById('dbg-type-scores');
+  scoresEl.innerHTML = '';
+  for (var i = 0; i < 7; i++) {
+    var row = document.createElement('div');
+    row.className = 'debug-score-row';
+    var pct = maxS > 0 ? (typeScores[i] / maxS * 100) : 0;
+    row.innerHTML = '<div class="debug-score-name">'+typeNames[i]+'</div>'+
+      '<div class="debug-score-bar-track"><div class="debug-score-bar" style="width:'+pct.toFixed(1)+'%;background:'+typeColors[i]+'"></div></div>'+
+      '<div class="debug-score-val">'+(typeScores[i]*100).toFixed(1)+'</div>';
+    scoresEl.appendChild(row);
+  }
+  var winText = '判定: '+typeNames[winnerIdx]+' ('+( maxS*100).toFixed(1)+'pt)';
+  if (curRes) winText += ' ／ 確信度: '+curRes.confidence+'%';
+  document.getElementById('dbg-winner').textContent = winText;
+  var axisEl = document.getElementById('dbg-axis-scores');
+  axisEl.innerHTML = '';
+  var axes = [
+    {n:'温かさ',v:voiceScore.warmth,c:'#F5923A'},
+    {n:'明瞭さ',v:voiceScore.clarity,c:'#4A7AC8'},
+    {n:'可愛さ',v:voiceScore.cute,c:'#D4B020'},
+    {n:'独特さ',v:voiceScore.unique,c:'#9B6ED4'}
+  ];
+  for (var i = 0; i < axes.length; i++) {
+    var row = document.createElement('div');
+    row.className = 'debug-score-row';
+    row.innerHTML = '<div class="debug-score-name">'+axes[i].n+'</div>'+
+      '<div class="debug-score-bar-track"><div class="debug-score-bar" style="width:'+(axes[i].v*100).toFixed(1)+'%;background:'+axes[i].c+'"></div></div>'+
+      '<div class="debug-score-val">'+(axes[i].v*100).toFixed(1)+'</div>';
+    axisEl.appendChild(row);
+  }
+}
 
 </script>
 </body>
