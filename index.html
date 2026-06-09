@@ -1064,6 +1064,85 @@ body{font-family:'Zen Maru Gothic','Noto Sans JP',sans-serif;background:#0E0818;
   transition: all .2s ease;
 }
 .debug-toggle-btn:hover { color: rgba(255,255,255,.4); border-color: rgba(255,255,255,.2); }
+
+/* ===== 近接タイプ ===== */
+.near-types-wrap {
+  margin: 14px 0 18px;
+}
+.near-types-title {
+  font-size: .58rem; font-weight: 900; color: rgba(255,255,255,.3);
+  letter-spacing: .12em; margin-bottom: 8px;
+}
+.near-types-row {
+  display: flex; gap: 8px; flex-wrap: wrap;
+}
+.near-type-chip {
+  display: flex; align-items: center; gap: 5px;
+  padding: 5px 12px; border-radius: 20px;
+  font-size: .7rem; font-weight: 700;
+  border: 1px solid rgba(255,255,255,.12);
+  background: rgba(255,255,255,.04);
+  color: rgba(255,255,255,.55);
+  transition: background .2s;
+}
+.near-type-chip .nt-dot {
+  width: 8px; height: 8px; border-radius: 50%; flex-shrink: 0;
+}
+.near-type-chip .nt-score {
+  font-size: .6rem; color: rgba(255,255,255,.3); margin-left: 2px;
+}
+
+/* ===== 判定理由 ===== */
+.reason-wrap {
+  background: rgba(255,255,255,.03);
+  border: 1px solid rgba(255,255,255,.07);
+  border-radius: 14px; padding: 13px 15px;
+  margin-bottom: 20px;
+}
+.reason-title {
+  font-size: .6rem; font-weight: 900; color: rgba(255,255,255,.3);
+  letter-spacing: .12em; margin-bottom: 10px;
+}
+.reason-row {
+  display: flex; align-items: center; gap: 8px;
+  margin-bottom: 6px;
+}
+.reason-name {
+  font-size: .72rem; font-weight: 700; color: rgba(255,255,255,.65);
+  width: 72px; flex-shrink: 0;
+}
+.reason-bar-track {
+  flex: 1; height: 6px; background: rgba(255,255,255,.06);
+  border-radius: 4px; overflow: hidden;
+}
+.reason-bar-fill {
+  height: 100%; border-radius: 4px;
+  transition: width .8s cubic-bezier(.4,0,.2,1);
+}
+.reason-val {
+  font-size: .68rem; font-weight: 900; color: rgba(255,255,255,.5);
+  width: 36px; text-align: right; flex-shrink: 0;
+}
+.reason-note {
+  font-size: .62rem; color: rgba(255,255,255,.25);
+  margin-top: 6px; line-height: 1.6;
+}
+
+/* ===== 4軸バー: サブラベル ===== */
+.vf-sublabel {
+  font-size: .6rem; color: rgba(255,255,255,.28);
+  line-height: 1.4; margin-top: 2px;
+}
+.vf-label-col {
+  display: flex; flex-direction: column;
+  width: 64px; flex-shrink: 0;
+}
+.vf-label-main {
+  font-size: .72rem; font-weight: 700; color: rgba(255,255,255,.6);
+}
+.vf-label-desc {
+  font-size: .55rem; color: rgba(255,255,255,.3); line-height: 1.3;
+}
 </style>
 </head>
 <body>
@@ -1254,6 +1333,20 @@ body{font-family:'Zen Maru Gothic','Noto Sans JP',sans-serif;background:#0E0818;
         <div class="res-en" id="res-en"></div>
         <div class="res-catch" id="res-catch"></div>
         <div class="res-pill" id="res-pill"></div>
+
+        <!-- 近接タイプ -->
+        <div class="near-types-wrap" id="near-types-wrap" style="display:none">
+          <div class="near-types-title">▸ あなたの声に近いタイプ</div>
+          <div class="near-types-row" id="near-types-row"></div>
+        </div>
+
+        <!-- 判定理由 -->
+        <div class="reason-wrap" id="reason-wrap" style="display:none">
+          <div class="reason-title">▸ 今回の判定で特に強く影響した特徴</div>
+          <div id="reason-rows"></div>
+          <div class="reason-note" id="reason-note"></div>
+        </div>
+
         <div class="radar-wrap">
           <div class="radar-ttl">🔊 あなたの声の特性マップ</div>
           <canvas id="radarChart" width="240" height="240" style="width:100%;max-width:240px;display:block;margin:0 auto;"></canvas>
@@ -1263,22 +1356,34 @@ body{font-family:'Zen Maru Gothic','Noto Sans JP',sans-serif;background:#0E0818;
         <div class="voice-feat-wrap" id="voice-feat-wrap" style="display:none">
           <div class="vf-title">✦ あなたの声の特徴（音声解析結果）</div>
           <div class="vf-row">
-            <div class="vf-label">🌡️ 温かさ</div>
+            <div class="vf-label-col">
+              <span class="vf-label-main">🌡️ 温かさ</span>
+              <span class="vf-label-desc">安心感・包容力<br>（息感・柔らかさ）</span>
+            </div>
             <div class="vf-bar-track"><div class="vf-bar-fill" id="vf-warmth"></div></div>
             <div class="vf-val" id="vf-warmth-val">--</div>
           </div>
           <div class="vf-row">
-            <div class="vf-label">✨ 明瞭さ</div>
+            <div class="vf-label-col">
+              <span class="vf-label-main">✨ 明瞭さ</span>
+              <span class="vf-label-desc">聞き取りやすさ<br>（声の明るさ・音量）</span>
+            </div>
             <div class="vf-bar-track"><div class="vf-bar-fill" id="vf-clarity"></div></div>
             <div class="vf-val" id="vf-clarity-val">--</div>
           </div>
           <div class="vf-row">
-            <div class="vf-label">🌸 可愛さ</div>
+            <div class="vf-label-col">
+              <span class="vf-label-main">🌸 可愛さ</span>
+              <span class="vf-label-desc">親しみやすさ<br>（声の高さ・抑揚）</span>
+            </div>
             <div class="vf-bar-track"><div class="vf-bar-fill" id="vf-cute"></div></div>
             <div class="vf-val" id="vf-cute-val">--</div>
           </div>
           <div class="vf-row">
-            <div class="vf-label">💎 独特さ</div>
+            <div class="vf-label-col">
+              <span class="vf-label-main">💎 独特さ</span>
+              <span class="vf-label-desc">耳に残る個性<br>（話者特徴量）</span>
+            </div>
             <div class="vf-bar-track"><div class="vf-bar-fill" id="vf-unique"></div></div>
             <div class="vf-val" id="vf-unique-val">--</div>
           </div>
@@ -1939,7 +2044,7 @@ function classify(fv) {
   console.log('[Engine v5] winner:', ['赤','橙','黄','緑','青','紫','藍'][maxIdx],
     'conf:', conf, 'gap:', gap.toFixed(3), 'qc:', qc.toFixed(2));
 
-  return {typeIdx: maxIdx, conf: conf, sd: gap};
+  return {typeIdx: maxIdx, conf: conf, sd: gap, scores: scores};
 }
 
 function checkInconsistency(q) {
@@ -2047,6 +2152,107 @@ function generateScienceText(vs, r) {
   return parts.slice(0, 2).join(' ');
 }
 
+
+// ============================================================
+// 近接タイプ表示
+// ============================================================
+function renderNearTypes(cls) {
+  if (!cls.scores) return;
+  var wrap = document.getElementById('near-types-wrap');
+  var row  = document.getElementById('near-types-row');
+  if (!wrap || !row) return;
+
+  var typeNames  = ['赤のリーダー','橙のガーディアン','黄のスカウト',
+                    '緑のヒーラー','青のミステリアス','紫のカリスマ','藍のトリック'];
+  var typeColors = ['#E85252','#F5923A','#D4B020','#4AAA5E','#4A7AC8','#9B6ED4','#5A6AD4'];
+  var typeEmoji  = ['⚔️','🛡️','⭐','💚','🗡️','✨','🎭'];
+
+  // sort scores descending, take 2nd and 3rd
+  var indexed = cls.scores.map(function(s,i){return {s:s,i:i};});
+  indexed.sort(function(a,b){return b.s-a.s;});
+
+  row.innerHTML = '';
+  for (var k = 1; k <= 2; k++) {
+    if (!indexed[k]) continue;
+    var t = indexed[k];
+    var diff = Math.round((indexed[0].s - t.s) * 100);
+    var chip = document.createElement('div');
+    chip.className = 'near-type-chip';
+    chip.style.borderColor = typeColors[t.i] + '44';
+    chip.innerHTML =
+      '<div class="nt-dot" style="background:' + typeColors[t.i] + '"></div>' +
+      typeEmoji[t.i] + ' ' + typeNames[t.i] +
+      '<span class="nt-score">-' + diff + 'pt</span>';
+    row.appendChild(chip);
+  }
+  wrap.style.display = 'block';
+}
+
+// ============================================================
+// 判定理由の可視化
+// ============================================================
+function renderReason(cls, vs) {
+  var wrap = document.getElementById('reason-wrap');
+  var rows = document.getElementById('reason-rows');
+  var note = document.getElementById('reason-note');
+  if (!wrap || !rows || !vs || vs._silent) return;
+
+  // winnerのスコア内訳を計算
+  var zcr  = vs.zcr, sc  = vs.sc,  ap   = vs.aperiod;
+  var tilt = vs.tilt, infl= vs.infl, rms  = vs.rms;
+  function cl(v){return Math.max(0,Math.min(1,v));}
+  var w  = cl((1-zcr)*0.35+tilt*0.35+ap*0.30);
+  var c  = cl(sc*0.40+rms*0.35+(1-ap)*0.25);
+  var cu = cl(zcr*0.45+infl*0.35+sc*0.20);
+  var dev= Math.abs(zcr-0.5)+Math.abs(sc-0.5)+Math.abs(tilt-0.5);
+  var un = cl(ap*0.35+Math.min(1,dev/0.8)*0.35+infl*0.30);
+
+  // 各特徴量の判定への寄与度（+pt表示用）
+  var contributions = [
+    {name:'温かさ',      val:w,    color:'#F5923A', pct: Math.round(w*100)},
+    {name:'明瞭さ',      val:c,    color:'#4A7AC8', pct: Math.round(c*100)},
+    {name:'可愛さ',      val:cu,   color:'#D4B020', pct: Math.round(cu*100)},
+    {name:'独特さ',      val:un,   color:'#9B6ED4', pct: Math.round(un*100)},
+    {name:'声の音量',    val:rms,  color:'#E85252', pct: Math.round(rms*100)},
+    {name:'声の抑揚',    val:infl, color:'#6BB5AC', pct: Math.round(infl*100)},
+  ];
+
+  // winnerタイプに応じて上位3つを強調
+  var winnerWeights = [
+    [0.55,0.00,0.25,0.00,0.20,0.00],  // 赤: clarity,cute,rms
+    [0.00,0.55,0.00,0.00,0.00,0.00],  // 橙: warmth
+    [0.00,0.00,0.50,0.00,0.00,0.30],  // 黄: cute,infl
+    [0.35,0.00,0.00,0.00,0.00,0.30],  // 緑: warmth+tilt→warmth,unique
+    [0.00,0.00,0.00,0.50,0.00,0.00],  // 青: unique
+    [0.00,0.00,0.00,0.00,0.60,0.00],  // 紫: rms
+    [0.00,0.00,0.00,0.45,0.00,0.40],  // 藍: unique,infl
+  ];
+  var ww = winnerWeights[cls.typeIdx] || [0,0,0,0,0,0];
+  var scored = contributions.map(function(c,i){
+    return {name:c.name,color:c.color,eff:Math.round(c.pct*ww[i])};
+  });
+  scored.sort(function(a,b){return b.eff-a.eff;});
+  var top = scored.filter(function(s){return s.eff>0;}).slice(0,4);
+
+  if (top.length === 0) { wrap.style.display='none'; return; }
+
+  rows.innerHTML = '';
+  var maxEff = top[0].eff || 1;
+  for (var i=0;i<top.length;i++) {
+    var r = top[i];
+    var div = document.createElement('div');
+    div.className = 'reason-row';
+    div.innerHTML =
+      '<div class="reason-name">' + r.name + '</div>' +
+      '<div class="reason-bar-track"><div class="reason-bar-fill" style="width:' +
+        (r.eff/maxEff*100).toFixed(0) + '%;background:' + r.color + '"></div></div>' +
+      '<div class="reason-val">+' + r.eff + '</div>';
+    rows.appendChild(div);
+  }
+  if (note) note.textContent =
+    '音声録音 + 3問の回答から算出しました。録音するたびに変化します。';
+  wrap.style.display = 'block';
+}
 function showResult() {
   document.getElementById('analyzing').style.display = 'none';
   document.getElementById('result-sec').style.display = 'block';
@@ -2156,6 +2362,10 @@ function showResult() {
       if (sub) pill.textContent = r.role + ' ／ ' + sub;
     }
   }
+
+  // ── STEP 9: 近接タイプ + 判定理由 ──
+  renderNearTypes(cls);
+  renderReason(cls, voiceScore);
 
   document.getElementById('prog-bar').style.width = '100%';
   setTimeout(function(){ drawRadar(fvec, r.c1); }, 300);
@@ -2595,7 +2805,7 @@ restart = function() {
   document.getElementById('rec-dot-1').classList.add('active');
   document.getElementById('rec-dot-2').classList.remove('active');
   document.getElementById('rec-dot-3').classList.remove('active');
-  document.getElementById('voice-badge').style.display = 'none'; var vfw=document.getElementById('voice-feat-wrap'); if(vfw) vfw.style.display='none'; curSceneIdx=0;
+  document.getElementById('voice-badge').style.display = 'none'; var vfw=document.getElementById('voice-feat-wrap'); if(vfw) vfw.style.display='none'; curSceneIdx=0; var ntw=document.getElementById('near-types-wrap'); if(ntw) ntw.style.display='none'; var rw=document.getElementById('reason-wrap'); if(rw) rw.style.display='none';
   var errEl = document.getElementById('rec-error-box'); if(errEl){errEl.style.display='none';errEl.textContent='';}
   document.getElementById('recorder-section').classList.remove('show');
   _origRestart();
