@@ -1358,7 +1358,7 @@ body{font-family:'Zen Maru Gothic','Noto Sans JP',sans-serif;background:#0E0818;
           <div class="vf-row">
             <div class="vf-label-col">
               <span class="vf-label-main">🌡️ 温かさ</span>
-              <span class="vf-label-desc">安心感・包容力<br>（息感・柔らかさ）</span>
+              <span class="vf-label-desc">安心感・包容力<br>（HNR・声帯振動）</span>
             </div>
             <div class="vf-bar-track"><div class="vf-bar-fill" id="vf-warmth"></div></div>
             <div class="vf-val" id="vf-warmth-val">--</div>
@@ -1366,7 +1366,7 @@ body{font-family:'Zen Maru Gothic','Noto Sans JP',sans-serif;background:#0E0818;
           <div class="vf-row">
             <div class="vf-label-col">
               <span class="vf-label-main">✨ 明瞭さ</span>
-              <span class="vf-label-desc">聞き取りやすさ<br>（声の明るさ・音量）</span>
+              <span class="vf-label-desc">聞き取りやすさ<br>（Spectral Centroid・音量）</span>
             </div>
             <div class="vf-bar-track"><div class="vf-bar-fill" id="vf-clarity"></div></div>
             <div class="vf-val" id="vf-clarity-val">--</div>
@@ -1374,7 +1374,7 @@ body{font-family:'Zen Maru Gothic','Noto Sans JP',sans-serif;background:#0E0818;
           <div class="vf-row">
             <div class="vf-label-col">
               <span class="vf-label-main">🌸 可愛さ</span>
-              <span class="vf-label-desc">親しみやすさ<br>（声の高さ・抑揚）</span>
+              <span class="vf-label-desc">親しみやすさ<br>（F0・声帯振動）</span>
             </div>
             <div class="vf-bar-track"><div class="vf-bar-fill" id="vf-cute"></div></div>
             <div class="vf-val" id="vf-cute-val">--</div>
@@ -1382,7 +1382,7 @@ body{font-family:'Zen Maru Gothic','Noto Sans JP',sans-serif;background:#0E0818;
           <div class="vf-row">
             <div class="vf-label-col">
               <span class="vf-label-main">💎 独特さ</span>
-              <span class="vf-label-desc">耳に残る個性<br>（話者特徴量）</span>
+              <span class="vf-label-desc">耳に残る個性<br>（Formant Variation）</span>
             </div>
             <div class="vf-bar-track"><div class="vf-bar-fill" id="vf-unique"></div></div>
             <div class="vf-val" id="vf-unique-val">--</div>
@@ -1436,9 +1436,24 @@ body{font-family:'Zen Maru Gothic','Noto Sans JP',sans-serif;background:#0E0818;
           <div class="debug-bar-wrap"><div class="debug-bar" id="dbg-sc-bar"></div></div>
         </div>
         <div class="debug-item">
-          <div class="debug-key">非周期性 (息感)</div>
+          <div class="debug-key">息感 Breathiness (HNR)</div>
           <div class="debug-val" id="dbg-ap">--</div>
           <div class="debug-bar-wrap"><div class="debug-bar" id="dbg-ap-bar"></div></div>
+        </div>
+        <div class="debug-item">
+          <div class="debug-key">高域比率 HFR (ウィスパー)</div>
+          <div class="debug-val" id="dbg-hfr">--</div>
+          <div class="debug-bar-wrap"><div class="debug-bar" id="dbg-hfr-bar"></div></div>
+        </div>
+        <div class="debug-item">
+          <div class="debug-key">ピッチ変動 PVar (抑揚)</div>
+          <div class="debug-val" id="dbg-pvar">--</div>
+          <div class="debug-bar-wrap"><div class="debug-bar" id="dbg-pvar-bar"></div></div>
+        </div>
+        <div class="debug-item">
+          <div class="debug-key">スペクトル変化 Flux</div>
+          <div class="debug-val" id="dbg-flux">--</div>
+          <div class="debug-bar-wrap"><div class="debug-bar" id="dbg-flux-bar"></div></div>
         </div>
         <div class="debug-item">
           <div class="debug-key">スペクトル傾斜 (柔らかさ)</div>
@@ -1469,33 +1484,6 @@ body{font-family:'Zen Maru Gothic','Noto Sans JP',sans-serif;background:#0E0818;
         録音するたびに数値が変わることを確認してください。<br>
         数値が毎回同じ場合は音声解析が機能していません。
       </div>
-    </div>
-
-    <button class="retry-btn" onclick="restart()">🔄 もう一度診断する</button>
-  </div>
-  <div class="tagline">声よ、永遠に。</div>
-  <div class="credits-block">
-    <div class="credit-endroll">
-      <div class="credit-col">
-        <span class="credit-label">企画・開発</span>
-        <span class="credit-val">nanoca Inc.</span>
-      </div>
-      <div class="credit-col">
-        <span class="credit-label">Research Partner</span>
-        <span class="credit-val">コエトワ Voice Lab</span>
-      </div>
-      <div class="credit-col">
-        <span class="credit-label">Scientific Supervision</span>
-        <span class="credit-val">林大輔</span>
-      </div>
-    </div>
-  </div>
-  <div class="legal-block">
-    <p>© nanoca Inc. ／ 7色声キャラ診断™</p>
-  </div>
-</div>
-<div class="toast" id="toast"></div>
-
 <script>
 // ============================================================
 // IP DATA — 声キャラ7色診断™ キャラクター定義
@@ -1968,81 +1956,79 @@ function extractFeatures(a) {
 
 function classify(fv) {
   // ============================================================
-  // VOICE-DOMINANT ENGINE v5
-  // 検証済み: N=10000 均等分布 7/7フィンガープリント正解
+  // VOICE ENGINE v6 — 息感・鼻声・抑揚・声の強さに対応
   // ============================================================
   if (!voiceScore || voiceScore._silent) {
     var idx = Math.floor(Math.random() * 7);
-    return {typeIdx: idx, conf: 52, sd: 0.05};
+    return {typeIdx: idx, conf: 52, sd: 0.05, scores: [0,0,0,0,0,0,0]};
   }
 
-  var zcr  = voiceScore.zcr;
-  var sc   = voiceScore.sc;
-  var ap   = voiceScore.aperiod;
-  var tilt = voiceScore.tilt;
-  var infl = voiceScore.infl;
-  var rms  = voiceScore.rms;
+  var zcr    = voiceScore.zcr;
+  var sc     = voiceScore.sc;
+  var tilt   = voiceScore.tilt;
+  var infl   = voiceScore.infl;
+  var rms    = voiceScore.rms;
+  var hnr    = voiceScore.hnr;      // 周期性（高=クリーン声）
+  var breath = voiceScore.breath;   // 息感（高=ウィスパー）
+  var hfr    = voiceScore.hfr;      // 高域比率（高=ウィスパー/ノイズ）
+  var flux   = voiceScore.flux;     // スペクトル変化（高=表現豊か）
+  var pvar   = voiceScore.pvar;     // ピッチ変動（高=抑揚大）
+  var qc     = contextQuality;
 
   function cl(v){ return Math.max(0, Math.min(1, v)); }
 
-  // 4軸スコア (0-1)
-  var warmth  = cl((1-zcr)*0.35 + tilt*0.35 + ap*0.30);
-  var clarity = cl(sc*0.40 + rms*0.35 + (1-ap)*0.25);
-  var cute    = cl(zcr*0.45 + infl*0.35 + sc*0.20);
-  var devVal  = Math.abs(zcr-0.5)+Math.abs(sc-0.5)+Math.abs(tilt-0.5);
-  var unique  = cl(ap*0.35 + Math.min(1,devVal/0.8)*0.35 + infl*0.30);
+  // 4軸 (voiceScore からそのまま)
+  var w  = voiceScore.warmth;
+  var c  = voiceScore.clarity;
+  var cu = voiceScore.cute;
+  var un = voiceScore.unique;
 
-  // 設問補正 (contextQuality=0〜1: 音声の信頼度)
-  // ブレンドは行わない。信頼度が低い場合はスコアの確信度のみ下げる
-  var qc = contextQuality; // 0.5〜1.0
-
-  // 赤ペナルティ: rms>0.92は紫領域
+  // 赤: 強いHNR+高RMS+低breath → 力強いクリーン声
   var redPen = Math.max(0, (rms - 0.92) * 5);
-
   var scores = [
-    // 赤: 高clarity + 低cute + 中rms
-    clarity*0.55 + (1-cute)*0.25 + (1-redPen)*0.20,
+    // 赤: 明瞭+力強い (hnr高い, rms高め, breath低い)
+    cl(c*0.40 + hnr*0.30 + (1-breath)*0.20 + (1-redPen)*0.10),
 
-    // 橙: 高warmth + 低zcr + 高tilt
-    warmth*0.55 + (1-zcr)*0.25 + tilt*0.20,
+    // 橙: 温かい+安定 (hnr高い, tilt高い, low zcr)
+    cl(w*0.45 + hnr*0.25 + (1-zcr)*0.20 + tilt*0.10),
 
-    // 黄: 高cute + 高infl + 低unique
-    cute*0.50 + infl*0.30 + (1-unique)*0.20,
+    // 黄: 可愛い+抑揚 (zcr高, pvar高, flux高)
+    cl(cu*0.40 + pvar*0.30 + flux*0.20 + (1-breath)*0.10),
 
-    // 緑: warmth + ap + tilt (tiltで青と分離)
-    warmth*0.35 + ap*0.30 + tilt*0.35,
+    // 緑: 温かい+息感 (breath中程度, tilt高い, hnr中)
+    // ウィスパーではなく「優しい息感」を検出
+    cl(w*0.35 + cl(breath*2*(1-breath)*4)*0.30 + tilt*0.25 + hnr*0.10),
 
-    // 青: unique + ap + 低sc
-    unique*0.50 + ap*0.25 + (1-sc)*0.25,
+    // 青: 独特+息感強い (breath高い, unique高, hnr低)
+    // ウィスパー/ハスキーで強く出る
+    cl(un*0.40 + breath*0.35 + (1-hnr)*0.15 + hfr*0.10),
 
-    // 紫: rms二乗 → 超高RMSのみ勝てる
-    (rms*rms)*0.60 + sc*0.20 + clarity*0.20,
+    // 紫: rms超高+HNR高 → 存在感抜群の力声
+    cl((rms*rms)*0.55 + hnr*0.25 + sc*0.20),
 
-    // 藍: infl + unique (uniqueで黄と分離)
-    infl*0.40 + unique*0.45 + sc*0.15
+    // 藍: 変化量最大 (pvar高, flux高, unique高)
+    cl((pvar+flux)*0.40 + un*0.40 + sc*0.20),
   ];
 
-  // 最高スコアのタイプを選ぶ
   var maxScore = -1, maxIdx = 0, secondScore = -1;
   for (var t = 0; t < scores.length; t++) {
     if (scores[t] > maxScore) {
-      secondScore = maxScore;
-      maxScore = scores[t];
-      maxIdx = t;
+      secondScore = maxScore; maxScore = scores[t]; maxIdx = t;
     } else if (scores[t] > secondScore) {
       secondScore = scores[t];
     }
   }
 
-  var gap = maxScore - secondScore;
-  // 確信度: gap × contextQuality で調整
+  var gap  = maxScore - secondScore;
   var conf = Math.min(95, Math.round(50 + gap * 100 * qc));
 
-  console.log('[Engine v5] scores:', scores.map(function(s,i){
-    return ['赤','橙','黄','緑','青','紫','藍'][i]+':'+s.toFixed(3);
-  }));
-  console.log('[Engine v5] winner:', ['赤','橙','黄','緑','青','紫','藍'][maxIdx],
-    'conf:', conf, 'gap:', gap.toFixed(3), 'qc:', qc.toFixed(2));
+  console.log('[Engine v6] scores:',
+    scores.map(function(s,i){
+      return ['赤','橙','黄','緑','青','紫','藍'][i]+':'+s.toFixed(3);
+    })
+  );
+  console.log('[Engine v6] winner:', ['赤','橙','黄','緑','青','紫','藍'][maxIdx],
+    'conf:', conf, 'gap:', gap.toFixed(3));
 
   return {typeIdx: maxIdx, conf: conf, sd: gap, scores: scores};
 }
@@ -2197,60 +2183,62 @@ function renderReason(cls, vs) {
   var note = document.getElementById('reason-note');
   if (!wrap || !rows || !vs || vs._silent) return;
 
-  // winnerのスコア内訳を計算
-  var zcr  = vs.zcr, sc  = vs.sc,  ap   = vs.aperiod;
-  var tilt = vs.tilt, infl= vs.infl, rms  = vs.rms;
-  function cl(v){return Math.max(0,Math.min(1,v));}
-  var w  = cl((1-zcr)*0.35+tilt*0.35+ap*0.30);
-  var c  = cl(sc*0.40+rms*0.35+(1-ap)*0.25);
-  var cu = cl(zcr*0.45+infl*0.35+sc*0.20);
-  var dev= Math.abs(zcr-0.5)+Math.abs(sc-0.5)+Math.abs(tilt-0.5);
-  var un = cl(ap*0.35+Math.min(1,dev/0.8)*0.35+infl*0.30);
-
-  // 各特徴量の判定への寄与度（+pt表示用）
-  var contributions = [
-    {name:'温かさ',      val:w,    color:'#F5923A', pct: Math.round(w*100)},
-    {name:'明瞭さ',      val:c,    color:'#4A7AC8', pct: Math.round(c*100)},
-    {name:'可愛さ',      val:cu,   color:'#D4B020', pct: Math.round(cu*100)},
-    {name:'独特さ',      val:un,   color:'#9B6ED4', pct: Math.round(un*100)},
-    {name:'声の音量',    val:rms,  color:'#E85252', pct: Math.round(rms*100)},
-    {name:'声の抑揚',    val:infl, color:'#6BB5AC', pct: Math.round(infl*100)},
+  // 全特徴量の値
+  var features = [
+    {name:'温かさ',     val:vs.warmth,  color:'#F5923A', desc:'低い声・柔らかい'},
+    {name:'明瞭さ',     val:vs.clarity, color:'#4A7AC8', desc:'声の通り・音量'},
+    {name:'可愛さ',     val:vs.cute,    color:'#D4B020', desc:'高さ・明るさ'},
+    {name:'独特さ',     val:vs.unique,  color:'#9B6ED4', desc:'個性・変化量'},
+    {name:'声の息感',   val:vs.breath,  color:'#6BB5AC', desc:'ウィスパー成分'},
+    {name:'声の抑揚',   val:vs.pvar,    color:'#7AD494', desc:'高低の変化幅'},
+    {name:'声の変化量', val:vs.flux,    color:'#8AB4FF', desc:'表現の豊かさ'},
+    {name:'声の強さ',   val:vs.rms,     color:'#E85252', desc:'音量・パワー'},
   ];
 
-  // winnerタイプに応じて上位3つを強調
-  var winnerWeights = [
-    [0.55,0.00,0.25,0.00,0.20,0.00],  // 赤: clarity,cute,rms
-    [0.00,0.55,0.00,0.00,0.00,0.00],  // 橙: warmth
-    [0.00,0.00,0.50,0.00,0.00,0.30],  // 黄: cute,infl
-    [0.35,0.00,0.00,0.00,0.00,0.30],  // 緑: warmth+tilt→warmth,unique
-    [0.00,0.00,0.00,0.50,0.00,0.00],  // 青: unique
-    [0.00,0.00,0.00,0.00,0.60,0.00],  // 紫: rms
-    [0.00,0.00,0.00,0.45,0.00,0.40],  // 藍: unique,infl
+  // タイプ別の主要特徴量インデックス（上記配列の順）
+  var typeKeys = [
+    [1,0,4],  // 赤: 明瞭さ, 温かさ, 声の息感(低い)
+    [0,1,4],  // 橙: 温かさ, 明瞭さ, 息感
+    [2,5,6],  // 黄: 可愛さ, 抑揚, 変化量
+    [0,4,1],  // 緑: 温かさ, 息感, 明瞭さ
+    [3,4,7],  // 青: 独特さ, 息感, 強さ
+    [1,7,0],  // 紫: 明瞭さ, 強さ, 温かさ
+    [5,6,3],  // 藍: 抑揚, 変化量, 独特さ
   ];
-  var ww = winnerWeights[cls.typeIdx] || [0,0,0,0,0,0];
-  var scored = contributions.map(function(c,i){
-    return {name:c.name,color:c.color,eff:Math.round(c.pct*ww[i])};
+
+  var keyIdxs = typeKeys[cls.typeIdx] || [0,1,2];
+  var maxVal  = 0;
+  var top     = keyIdxs.map(function(ki){
+    var f   = features[ki];
+    var eff = Math.round(f.val * 100);
+    if (eff > maxVal) maxVal = eff;
+    return {name:f.name, eff:eff, color:f.color, desc:f.desc};
   });
-  scored.sort(function(a,b){return b.eff-a.eff;});
-  var top = scored.filter(function(s){return s.eff>0;}).slice(0,4);
-
-  if (top.length === 0) { wrap.style.display='none'; return; }
+  // 残りの特徴量も追加（効果量上位1つ）
+  var others = features.filter(function(_,i){
+    return keyIdxs.indexOf(i) === -1;
+  }).sort(function(a,b){return b.val-a.val;});
+  if (others.length > 0) {
+    var oth = others[0];
+    top.push({name:oth.name, eff:Math.round(oth.val*100), color:oth.color, desc:oth.desc});
+  }
+  top.sort(function(a,b){return b.eff-a.eff;});
 
   rows.innerHTML = '';
-  var maxEff = top[0].eff || 1;
-  for (var i=0;i<top.length;i++) {
-    var r = top[i];
-    var div = document.createElement('div');
+  var maxEff = top[0] ? Math.max(top[0].eff, 1) : 1;
+  for (var i = 0; i < top.length && i < 4; i++) {
+    var item = top[i];
+    var div  = document.createElement('div');
     div.className = 'reason-row';
     div.innerHTML =
-      '<div class="reason-name">' + r.name + '</div>' +
+      '<div class="reason-name" title="' + item.desc + '">' + item.name + '</div>' +
       '<div class="reason-bar-track"><div class="reason-bar-fill" style="width:' +
-        (r.eff/maxEff*100).toFixed(0) + '%;background:' + r.color + '"></div></div>' +
-      '<div class="reason-val">+' + r.eff + '</div>';
+        (item.eff / maxEff * 100).toFixed(0) + '%;background:' + item.color + '"></div></div>' +
+      '<div class="reason-val">+' + item.eff + '</div>';
     rows.appendChild(div);
   }
   if (note) note.textContent =
-    '音声録音 + 3問の回答から算出しました。録音するたびに変化します。';
+    '録音した声から算出。地声・ウィスパー・鼻声・抑揚で変化します。';
   wrap.style.display = 'block';
 }
 function showResult() {
@@ -2630,130 +2618,231 @@ function analyzeVoice() {
 }
 
 function computeVoiceFeatures(buffer) {
-  var ch = buffer.getChannelData(0);
+  var ch  = buffer.getChannelData(0);
   var len = ch.length;
-  var sr = buffer.sampleRate;
+  var sr  = buffer.sampleRate;
 
   // ── SAFETY: silent check ──
   var totalE = 0;
   for (var i = 0; i < len; i++) totalE += ch[i] * ch[i];
   if (totalE < 0.0001) {
-    // Nearly silent – neutral score
-    voiceScore = {zcr:0.5,rms:0.05,sc:0.5,aperiod:0.5,tilt:0.5,infl:0.5,
-      warmth:0.5,clarity:0.5,cute:0.5,unique:0.5,pitch:3,inflection:3,_silent:true};
+    voiceScore = {
+      zcr:0.5, rms:0.05, sc:0.5, aperiod:0.5, tilt:0.5, infl:0.5,
+      hnr:0.5, breath:0.5, hfr:0.5, flux:0.5, pvar:0.5,
+      warmth:0.5, clarity:0.5, cute:0.5, unique:0.5,
+      pitch:3, inflection:3, _silent:true
+    };
     setTimeout(function(){finishAnalysis();}, 3400);
     return;
   }
 
-  // ── F1: RMS ──
+  // ─────────────────────────────────────────────
+  // F1: RMS (声の強さ)
+  // ─────────────────────────────────────────────
   var rms = Math.sqrt(totalE / len);
-  // Auto-scale: use actual rms as reference
   var rmsNorm = Math.max(0, Math.min(1, rms / 0.15));
 
-  // ── F2: Zero Crossing Rate → F0 proxy ──
+  // ─────────────────────────────────────────────
+  // F2: ZCR → F0 proxy (声の高さ)
+  // ─────────────────────────────────────────────
   var crossings = 0;
   for (var i = 1; i < len; i++) {
     if ((ch[i] >= 0) !== (ch[i-1] >= 0)) crossings++;
   }
   var zcr = crossings / len;
-  // Typical speech: 0.01 (low voice) to 0.12 (high/noise)
-  // Normalize to 0-1 linearly within that range
   var zcrNorm = Math.max(0, Math.min(1, (zcr - 0.01) / 0.10));
 
-  // ── F3: Spectral Centroid via Web Audio AnalyserNode approach (FFT on downsampled) ──
-  // Use every 8th sample (downsample) for 64-point DFT on first 2s of audio
-  var useSamples = Math.min(len, sr * 2); // up to 2 seconds
-  var step = 8;
-  var N = Math.floor(useSamples / step);
-  var downsampled = new Float32Array(N);
-  for (var i = 0; i < N; i++) downsampled[i] = ch[i * step];
-  // DFT: compute magnitude spectrum (first N/2 bins)
-  var halfN = Math.floor(N / 2);
-  var mags = new Float32Array(halfN);
+  // ─────────────────────────────────────────────
+  // F3: HNR proxy via autocorrelation
+  //     地声=高HNR, ウィスパー=低HNR
+  //     自己相関の最大ピーク = 周期性の強さ
+  // ─────────────────────────────────────────────
+  var useSr  = Math.min(len, Math.floor(sr * 1.5)); // 1.5秒分
+  var stride = Math.max(1, Math.floor(sr / 8000));   // 8kHz相当にダウンサンプル
+  var ds = []; // downsampled
+  for (var i = 0; i < useSr; i += stride) ds.push(ch[i]);
+  var dsLen = ds.length;
+
+  // 自己相関: lag 2ms〜20ms相当
+  var sr8k   = Math.floor(sr / stride);
+  var lagMin = Math.max(1,  Math.floor(sr8k * 0.002));  // 2ms
+  var lagMax = Math.min(dsLen-1, Math.floor(sr8k * 0.020)); // 20ms
+  var r0 = 0;
+  for (var i = 0; i < dsLen; i++) r0 += ds[i] * ds[i];
+  r0 = Math.max(r0, 1e-10);
+  var maxAC = 0;
+  for (var lag = lagMin; lag <= lagMax; lag++) {
+    var ac = 0;
+    for (var i = 0; i + lag < dsLen; i++) ac += ds[i] * ds[i+lag];
+    var acNorm = ac / r0;
+    if (acNorm > maxAC) maxAC = acNorm;
+  }
+  // maxAC: 0〜1 (1=完全周期的=クリーン声, 0=ホワイトノイズ=息声)
+  var hnrNorm = Math.max(0, Math.min(1, maxAC));
+
+  // ─────────────────────────────────────────────
+  // F4: Breathiness = 1 - HNR
+  //     ウィスパー→高, 地声→低
+  // ─────────────────────────────────────────────
+  var breathNorm = 1 - hnrNorm;
+
+  // ─────────────────────────────────────────────
+  // F5: FFTスペクトル (ダウンサンプル済みdsを使用)
+  // ─────────────────────────────────────────────
+  var fftN   = Math.min(dsLen, 256);
+  var halfN  = Math.floor(fftN / 2);
+  var mags   = new Float32Array(halfN);
   for (var k = 0; k < halfN; k++) {
     var re = 0, im = 0;
-    for (var n = 0; n < N; n++) {
-      var angle = 2 * Math.PI * k * n / N;
-      re += downsampled[n] * Math.cos(angle);
-      im += downsampled[n] * Math.sin(angle);
+    for (var n = 0; n < fftN; n++) {
+      var angle = 2 * Math.PI * k * n / fftN;
+      re += (ds[n] || 0) * Math.cos(angle);
+      im += (ds[n] || 0) * Math.sin(angle);
     }
     mags[k] = Math.sqrt(re*re + im*im);
   }
+
+  // Spectral Centroid (声の明るさ)
   var wSum = 0, mSum = 0;
   for (var k = 0; k < halfN; k++) { wSum += k * mags[k]; mSum += mags[k]; }
-  var sc = mSum > 0 ? wSum / mSum : halfN / 2;
-  // Normalize: low sc=0 (bass-heavy), high sc=1 (treble-heavy)
+  var sc     = mSum > 0 ? wSum / mSum : halfN * 0.5;
   var scNorm = Math.max(0, Math.min(1, sc / halfN));
 
-  // ── F4: Aperiodicity (consecutive sample diff variance) ──
-  var diffs = [];
-  var winAP = Math.floor(sr * 0.02); // 20ms windows
-  for (var w = 0; w + winAP < len; w += winAP) {
-    var dSum = 0;
-    for (var i = w+1; i < w+winAP; i++) dSum += Math.abs(ch[i]-ch[i-1]);
-    diffs.push(dSum / winAP);
-  }
-  var meanD = diffs.reduce(function(a,b){return a+b;},0) / diffs.length;
-  var varD = diffs.reduce(function(a,b){return a+Math.pow(b-meanD,2);},0) / diffs.length;
-  // meanD = average roughness (breathiness), varD = variance (periodicity stability)
-  // High meanD + high varD = rough/aperiodic; low = clean periodic
-  var aperiodNorm = Math.max(0, Math.min(1, (meanD * 5 + Math.sqrt(varD) * 3) / 2));
-
-  // ── F5: Spectral Tilt (low/high energy ratio across frequency) ──
+  // Spectral Tilt: 低域/全体エネルギー比 (高=柔らか, 低=鋭い)
+  var splitBin = Math.floor(halfN * 0.3);
   var lowE = 0, highE = 0;
-  var splitBin = Math.floor(halfN * 0.3); // split at 30% of spectrum
-  for (var k = 0; k < splitBin; k++) lowE += mags[k] * mags[k];
+  for (var k = 0; k < splitBin; k++) lowE  += mags[k] * mags[k];
   for (var k = splitBin; k < halfN; k++) highE += mags[k] * mags[k];
   var tiltRatio = (lowE + highE) > 0 ? lowE / (lowE + highE) : 0.5;
-  // 1 = very low-freq dominant (soft), 0 = high-freq dominant (sharp/bright)
-  var tiltNorm = Math.max(0, Math.min(1, tiltRatio));
+  var tiltNorm  = Math.max(0, Math.min(1, tiltRatio));
 
-  // ── F6: Inflection (RMS variance over 100ms windows) ──
-  var winSize = Math.floor(sr * 0.1);
-  var winRms = [];
-  for (var w = 0; w + winSize < len; w += winSize) {
-    var s = 0;
-    for (var k = w; k < w+winSize; k++) s += ch[k]*ch[k];
-    winRms.push(Math.sqrt(s / winSize));
+  // ─────────────────────────────────────────────
+  // F6: High Frequency Ratio
+  //     ウィスパー: 高域ノイズ多い → 高
+  //     鼻声:      低域共鳴強い   → 低
+  //     地声:      中間
+  // ─────────────────────────────────────────────
+  var hfSplit = Math.floor(halfN * 0.5);  // 50%以上を高域とする
+  var hfE = 0, allE = 0;
+  for (var k = 0; k < halfN; k++) {
+    allE += mags[k] * mags[k];
+    if (k >= hfSplit) hfE += mags[k] * mags[k];
   }
-  if (winRms.length < 2) winRms = [rms, rms * 1.1];
+  var hfrNorm = allE > 0 ? Math.max(0, Math.min(1, hfE / allE * 2.5)) : 0.5;
+  // *2.5: 典型的HFR~0.4→ 0〜1に伸張
+
+  // ─────────────────────────────────────────────
+  // F7: Inflection: RMS変動 (声の強弱変化)
+  // ─────────────────────────────────────────────
+  var winMs  = Math.floor(sr * 0.1);
+  var winRms = [];
+  for (var w = 0; w + winMs < len; w += winMs) {
+    var s = 0;
+    for (var k = w; k < w + winMs; k++) s += ch[k] * ch[k];
+    winRms.push(Math.sqrt(s / winMs));
+  }
+  if (winRms.length < 2) winRms = [rms, rms];
   var meanWR = winRms.reduce(function(a,b){return a+b;},0) / winRms.length;
   var varWR  = winRms.reduce(function(a,b){return a+Math.pow(b-meanWR,2);},0) / winRms.length;
-  var sdWR   = Math.sqrt(varWR);
-  // Normalize relative to mean (coefficient of variation)
-  var inflNorm = meanWR > 0 ? Math.max(0, Math.min(1, sdWR / meanWR)) : 0;
+  var inflNorm = meanWR > 0 ? Math.max(0, Math.min(1, Math.sqrt(varWR) / meanWR)) : 0;
 
-  // ── MAP → 4-AXIS (林大輔 framework) ──
-  // warmth:  low pitch + soft(tilt) + breathiness
-  var warmth  = (1 - zcrNorm)*0.35 + tiltNorm*0.35 + aperiodNorm*0.30;
-  // clarity: high brightness(sc) + high volume + periodic(low aperiod)
-  var clarity = scNorm*0.40 + rmsNorm*0.35 + (1-aperiodNorm)*0.25;
-  // cute:    high pitch + high inflection + bright
-  var cute    = zcrNorm*0.45 + inflNorm*0.35 + scNorm*0.20;
-  // unique:  aperiodic + extreme deviation from average profile
-  var dev     = Math.abs(zcrNorm-0.5)+Math.abs(scNorm-0.5)+Math.abs(tiltNorm-0.5);
-  var unique  = aperiodNorm*0.35 + Math.min(1,dev/0.8)*0.35 + inflNorm*0.30;
+  // ─────────────────────────────────────────────
+  // F8: Pitch Variation: ZCR の時間変化量
+  //     抑揚強調 → ZCRが上下大きく → 高
+  //     単調     → ZCRが安定    → 低
+  // ─────────────────────────────────────────────
+  var zcrWin  = Math.floor(sr * 0.05); // 50ms窓
+  var zcrWins = [];
+  for (var w = 0; w + zcrWin < len; w += zcrWin) {
+    var zc = 0;
+    for (var i = w+1; i < w+zcrWin; i++) {
+      if ((ch[i] >= 0) !== (ch[i-1] >= 0)) zc++;
+    }
+    zcrWins.push(zc / zcrWin);
+  }
+  if (zcrWins.length < 2) zcrWins = [zcr, zcr];
+  var meanZW = zcrWins.reduce(function(a,b){return a+b;},0) / zcrWins.length;
+  var varZW  = zcrWins.reduce(function(a,b){return a+Math.pow(b-meanZW,2);},0) / zcrWins.length;
+  var pvarNorm = meanZW > 0 ? Math.max(0, Math.min(1, Math.sqrt(varZW) / meanZW * 3)) : 0;
 
-  function cl(v){return Math.max(0,Math.min(1,v));}
-  warmth=cl(warmth); clarity=cl(clarity); cute=cl(cute); unique=cl(unique);
+  // ─────────────────────────────────────────────
+  // F9: Spectral Flux (フレーム間スペクトル変化)
+  //     抑揚豊か / 声質変化大 → 高
+  // ─────────────────────────────────────────────
+  var fluxWin = Math.floor(sr * 0.05);
+  var prevMags = null, fluxVals = [];
+  for (var w = 0; w + fluxWin < useSr; w += fluxWin) {
+    var fm = new Float32Array(8);
+    var fN = Math.min(fluxWin, 64);
+    for (var k = 0; k < 8; k++) {
+      var re = 0, im = 0;
+      for (var n = 0; n < fN; n++) {
+        var angle = 2 * Math.PI * k * n / fN;
+        var sIdx  = w + n * stride;
+        var sv    = sIdx < len ? ch[sIdx] : 0;
+        re += sv * Math.cos(angle);
+        im += sv * Math.sin(angle);
+      }
+      fm[k] = Math.sqrt(re*re + im*im);
+    }
+    if (prevMags) {
+      var diff = 0;
+      for (var k = 0; k < 8; k++) diff += Math.pow(fm[k]-prevMags[k], 2);
+      fluxVals.push(Math.sqrt(diff));
+    }
+    prevMags = fm;
+  }
+  var fluxNorm = 0;
+  if (fluxVals.length > 0) {
+    var meanF = fluxVals.reduce(function(a,b){return a+b;},0) / fluxVals.length;
+    fluxNorm  = Math.max(0, Math.min(1, meanF / 5));
+  }
 
-  function to5(v){return Math.max(1,Math.min(5,1+v*4));}
+  // ─────────────────────────────────────────────
+  // MAP → 4-AXIS (拡張版)
+  // ─────────────────────────────────────────────
+  function cl(v){ return Math.max(0, Math.min(1, v)); }
+
+  // 温かさ: HNR高い(クリーン)+低音(tilt)+柔らか(低HFR)
+  var warmth  = cl(hnrNorm*0.35 + tiltNorm*0.35 + (1-hfrNorm)*0.30);
+
+  // 明瞭さ: 明るさ(sc)+音量(rms)+周期的(HNR)
+  var clarity = cl(scNorm*0.35 + rmsNorm*0.35 + hnrNorm*0.30);
+
+  // 可愛さ: 高音(zcr)+抑揚(infl)+明るさ(sc)
+  var cute    = cl(zcrNorm*0.40 + inflNorm*0.35 + scNorm*0.25);
+
+  // 独特さ: 息感(breath)+音域変化(pvar)+フラックス(flux)
+  var devVal  = Math.abs(zcrNorm-0.5)+Math.abs(scNorm-0.5)+Math.abs(tiltNorm-0.5);
+  var unique  = cl(breathNorm*0.30 + pvarNorm*0.30 + fluxNorm*0.20 + Math.min(1,devVal/0.8)*0.20);
+
+  function to5(v){ return Math.max(1, Math.min(5, 1+v*4)); }
 
   voiceScore = {
-    zcr: zcrNorm, rms: rmsNorm, sc: scNorm,
-    aperiod: aperiodNorm, tilt: tiltNorm, infl: inflNorm,
-    warmth: warmth, clarity: clarity, cute: cute, unique: unique,
-    pitch: to5(zcrNorm), inflection: to5(inflNorm),
-    _raw: {rms:rms, zcr:zcr, sc:sc, tilt:tiltRatio, aperiod:meanD, infl:sdWR/Math.max(meanWR,0.001)}
+    // 基本特徴量
+    zcr:     zcrNorm,   rms:    rmsNorm,
+    sc:      scNorm,    tilt:   tiltNorm,
+    infl:    inflNorm,
+    // 新特徴量
+    hnr:     hnrNorm,   breath: breathNorm,
+    hfr:     hfrNorm,   flux:   fluxNorm,
+    pvar:    pvarNorm,
+    // 4軸
+    warmth:  warmth,    clarity: clarity,
+    cute:    cute,      unique:  unique,
+    // 後方互換
+    aperiod: breathNorm,
+    pitch:   to5(zcrNorm), inflection: to5(inflNorm),
+    _raw: {rms:rms, zcr:zcr, hnr:hnrNorm, breath:breathNorm,
+           hfr:hfrNorm, flux:fluxNorm, pvar:pvarNorm,
+           sc:scNorm, tilt:tiltRatio}
   };
 
-  // ── DEBUG LOG ──
-  console.log('[VoiceScore RAW]', JSON.stringify(voiceScore._raw));
-  console.log('[VoiceScore NORM]', {zcr:zcrNorm.toFixed(3), rms:rmsNorm.toFixed(3),
-    sc:scNorm.toFixed(3), ap:aperiodNorm.toFixed(3),
-    tilt:tiltNorm.toFixed(3), infl:inflNorm.toFixed(3)});
-  console.log('[4-Axis]', {warmth:warmth.toFixed(3), clarity:clarity.toFixed(3),
-    cute:cute.toFixed(3), unique:unique.toFixed(3)});
+  console.log('[Voice v6] RAW:', JSON.stringify(voiceScore._raw));
+  console.log('[Voice v6] 4-axis:', {w:warmth.toFixed(3),c:clarity.toFixed(3),
+    cu:cute.toFixed(3),un:unique.toFixed(3)});
+  console.log('[Voice v6] breath:', breathNorm.toFixed(3),
+    'hfr:', hfrNorm.toFixed(3), 'pvar:', pvarNorm.toFixed(3));
 
   setTimeout(function(){finishAnalysis();}, 3400);
 }
@@ -2851,14 +2940,16 @@ function populateDebugPanel() {
     if (el)  el.textContent    = pct + '%';
     if (bar) bar.style.width   = pct + '%';
   }
-  setDbg('dbg-zcr',  'dbg-zcr-bar',  voiceScore.zcr);
+    setDbg('dbg-zcr',  'dbg-zcr-bar',  voiceScore.zcr);
   setDbg('dbg-sc',   'dbg-sc-bar',   voiceScore.sc);
-  setDbg('dbg-ap',   'dbg-ap-bar',   voiceScore.aperiod);
+  setDbg('dbg-ap',   'dbg-ap-bar',   voiceScore.breath || voiceScore.aperiod);
   setDbg('dbg-tilt', 'dbg-tilt-bar', voiceScore.tilt);
   setDbg('dbg-infl', 'dbg-infl-bar', voiceScore.infl);
   setDbg('dbg-rms',  'dbg-rms-bar',  voiceScore.rms);
-
-  // ── classify() をそのまま再実行して7色スコアを取得 ──
+  setDbg('dbg-hfr',  'dbg-hfr-bar',  voiceScore.hfr  || 0);
+  setDbg('dbg-pvar', 'dbg-pvar-bar', voiceScore.pvar || 0);
+  setDbg('dbg-flux', 'dbg-flux-bar', voiceScore.flux || 0);
+    // ── classify() をそのまま再実行して7色スコアを取得 ──
   // classify() は voiceScore と contextQuality/contextMultiplier を使う
   var cls = classify(fvec);
   var winnerName = ['赤・リーダー','橙・ガーディアン','黄・スカウト',
@@ -2944,6 +3035,8 @@ function populateDebugPanel() {
   }
 }
 
+
 </script>
+<div class="toast" id="toast"></div>
 </body>
 </html>
