@@ -2048,61 +2048,120 @@ function generateScienceText(vs, r) {
 }
 
 function showResult() {
-  document.getElementById('analyzing').style.display='none';
-  document.getElementById('result-sec').style.display='block';
-  fvec=extractFeatures(ans);
-  var cls=classify(fvec);
-  var r=RESULTS[cls.typeIdx];
-  curRes=r; curRes.confidence=cls.conf; curRes.fvec=fvec;
-  if(cls.sd<0.6) document.getElementById('low-var-msg').classList.add('show');
-  document.getElementById('char-sprite').className='char-sprite '+r.sc;
-  var lbl=document.getElementById('type-lbl');
-  lbl.textContent='🎯 あなたは…';lbl.style.background=r.lb+'CC';
-  var cp=document.getElementById('conf-pct');
-  cp.textContent=cls.conf+'%';
-  cp.style.color=cls.conf>=75?'#7AD494':cls.conf>=60?'#FFE066':'#FF8A8A';
-  document.getElementById('color-bar').style.background='linear-gradient(90deg,'+r.c1+','+r.c2+')';
-  document.getElementById('res-name').textContent=r.name;
-  document.getElementById('res-name').style.color=r.c1;
-  document.getElementById('res-en').textContent=r.en;
-  document.getElementById('res-catch').textContent=r.catch;
-  var pill=document.getElementById('res-pill');
-  pill.textContent=r.role;pill.style.background=r.pb;pill.style.color=r.pc;
+  document.getElementById('analyzing').style.display = 'none';
+  document.getElementById('result-sec').style.display = 'block';
 
-  // New result fields
-  document.getElementById('res-firstimp').textContent = r.firstImpression || r.str || '';
-  document.getElementById('res-feat').textContent = r.voiceFeature || r.sci || '';
-  // Generate science text based on voice features
-  var sciText = generateScienceText(voiceScore, r);
+  // ── STEP 1: context quality from 3 survey answers ──
+  fvec = extractFeatures(ans);   // sets contextQuality, contextMultiplier
+
+  // ── STEP 2: classify using voiceScore (already set by computeVoiceFeatures) ──
+  var cls = classify(fvec);
+  var r   = RESULTS[cls.typeIdx];
+  curRes  = r;
+  curRes.confidence = cls.conf;
+  curRes.fvec = fvec;
+
+  // ── STEP 3: populate result UI ──
+  if (cls.sd < 0.3) document.getElementById('low-var-msg').classList.add('show');
+
+  document.getElementById('char-sprite').className = 'char-sprite ' + r.sc;
+
+  var lbl = document.getElementById('type-lbl');
+  lbl.textContent = '🎯 あなたは…';
+  lbl.style.background = r.lb + 'CC';
+
+  var cp = document.getElementById('conf-pct');
+  cp.textContent = cls.conf + '%';
+  cp.style.color = cls.conf >= 75 ? '#7AD494' : cls.conf >= 60 ? '#FFE066' : '#FF8A8A';
+
+  document.getElementById('color-bar').style.background =
+    'linear-gradient(90deg,' + r.c1 + ',' + r.c2 + ')';
+  document.getElementById('res-name').textContent = r.name;
+  document.getElementById('res-name').style.color  = r.c1;
+  document.getElementById('res-en').textContent    = r.en;
+  document.getElementById('res-catch').textContent = r.catch;
+
+  var pill = document.getElementById('res-pill');
+  pill.textContent   = r.role;
+  pill.style.background = r.pb;
+  pill.style.color      = r.pc;
+
+  // ── STEP 4: result text blocks ──
+  document.getElementById('res-firstimp').textContent = r.firstImpression || '';
+  document.getElementById('res-feat').textContent     = r.voiceFeature    || '';
+
+  // 科学的視点: voice解析ベースの一般語テキスト
   var sciEl = document.getElementById('res-secret');
-  if (sciEl) sciEl.textContent = sciText;
-  document.getElementById('res-secret').textContent = r.voiceSecret || r.str || '';
+  if (sciEl) sciEl.textContent = generateScienceText(voiceScore, r);
+
   document.getElementById('res-adv').textContent = r.adv || '';
 
-  // Activities
-  var actEl=document.getElementById('res-act');
-  actEl.innerHTML='';
-  for(var i=0;i<r.act.length;i++){var li=document.createElement('li');li.textContent=r.act[i];actEl.appendChild(li);}
+  var actEl = document.getElementById('res-act');
+  actEl.innerHTML = '';
+  for (var i = 0; i < r.act.length; i++) {
+    var li = document.createElement('li');
+    li.textContent = r.act[i];
+    actEl.appendChild(li);
+  }
 
-  // Random scene
+  // ── STEP 5: random scene ──
   curSceneIdx = Math.floor(Math.random() * r.scenes.length);
   renderScene(r, curSceneIdx);
 
-  // SubRole based on voice features (if voice data available)
-  if (voiceScore && r.subRoles) {
-    var maxAxis = 'highClarity', maxVal = voiceScore.clarity || 0;
-    if ((voiceScore.warmth||0) > maxVal) { maxVal = voiceScore.warmth; maxAxis = 'highWarmth'; }
-    if ((voiceScore.unique||0) > maxVal) { maxVal = voiceScore.unique; maxAxis = 'highUnique'; }
-    if ((voiceScore.cute||0) > maxVal) { maxVal = voiceScore.cute; maxAxis = 'highCute'; }
-    var subRole = r.subRoles[maxAxis];
-    if (subRole && pill) {
-      pill.textContent = r.role + ' ／ ' + subRole;
+  // ── STEP 6: voice badge + feature bars ──
+  if (voiceScore && !voiceScore._silent) {
+    document.getElementById('voice-badge').style.display = 'inline-flex';
+
+    var fw = document.getElementById('voice-feat-wrap');
+    if (fw) {
+      fw.style.display = 'block';
+      function setPct(id, valId, v) {
+        var pct = Math.round(v * 100);
+        var el  = document.getElementById(id);
+        var vel = document.getElementById(valId);
+        if (el)  el.style.width     = pct + '%';
+        if (vel) vel.textContent    = pct + '%';
+      }
+      setPct('vf-warmth',  'vf-warmth-val',  voiceScore.warmth);
+      setPct('vf-clarity', 'vf-clarity-val', voiceScore.clarity);
+      setPct('vf-cute',    'vf-cute-val',    voiceScore.cute);
+      setPct('vf-unique',  'vf-unique-val',  voiceScore.unique);
+
+      var ctxLabels = ['プライベートな声','友人との声','日常会話の声','発表・配信の声','パフォーマンスの声'];
+      var ctxIdx    = Math.max(0, (ans[0] || 1) - 1);
+      var note      = document.getElementById('vf-note');
+      if (note) note.textContent = '解析コンテキスト：' + (ctxLabels[ctxIdx] || '通常');
+    }
+
+    // ── STEP 7: rebuild fvec from voice data for radar ──
+    function v5(v){ return Math.max(1, Math.min(5, 1 + v * 4)); }
+    fvec = [
+      v5(voiceScore.clarity),
+      v5(voiceScore.warmth),
+      v5(voiceScore.unique),
+      v5(voiceScore.aperiod),
+      v5(voiceScore.cute),
+      v5(1 - voiceScore.infl * 0.5),
+      v5(voiceScore.zcr   * 0.6 + voiceScore.infl * 0.4),
+      v5(voiceScore.sc    * 0.5 + voiceScore.warmth * 0.5)
+    ];
+
+    // ── STEP 8: subRole ──
+    if (r.subRoles) {
+      var maxAxis = 'highClarity', maxVal = voiceScore.clarity || 0;
+      if ((voiceScore.warmth||0)  > maxVal){ maxVal=voiceScore.warmth;  maxAxis='highWarmth';  }
+      if ((voiceScore.unique||0)  > maxVal){ maxVal=voiceScore.unique;  maxAxis='highUnique';  }
+      if ((voiceScore.cute||0)    > maxVal){ maxVal=voiceScore.cute;    maxAxis='highCute';    }
+      var sub = r.subRoles[maxAxis];
+      if (sub) pill.textContent = r.role + ' ／ ' + sub;
     }
   }
 
-  document.getElementById('prog-bar').style.width='100%';
-  setTimeout(function(){drawRadar(fvec,r.c1);},300);
-  document.getElementById('result-sec').scrollIntoView({behavior:'smooth',block:'start'});
+  document.getElementById('prog-bar').style.width = '100%';
+  setTimeout(function(){ drawRadar(fvec, r.c1); }, 300);
+  document.getElementById('result-sec').scrollIntoView({behavior:'smooth', block:'start'});
+  // Auto-populate debug if already open
+  if (debugVisible) populateDebugPanel();
 }
 
 var curSceneIdx = 0;
@@ -2507,59 +2566,6 @@ startDiag = function() {
 };
 
 // Override showResult to blend voice scores
-var _origShowResult = showResult;
-showResult = function() {
-  _origShowResult();
-  // Voice-dominant: rebuild fvec from voice features (75%) + context correction (25%)
-  if (voiceScore) {
-    document.getElementById('voice-badge').style.display = 'inline-flex';
-    // Populate voice feature bars
-    var featWrap = document.getElementById('voice-feat-wrap');
-    if (featWrap) {
-      featWrap.style.display = 'block';
-      function setPct(id, valId, v) {
-        var pct = Math.round(v * 100);
-        var el = document.getElementById(id);
-        var vEl = document.getElementById(valId);
-        if (el) el.style.width = pct + '%';
-        if (vEl) vEl.textContent = pct + '%';
-      }
-      setPct('vf-warmth',  'vf-warmth-val',  voiceScore.warmth);
-      setPct('vf-clarity', 'vf-clarity-val', voiceScore.clarity);
-      setPct('vf-cute',    'vf-cute-val',    voiceScore.cute);
-      setPct('vf-unique',  'vf-unique-val',  voiceScore.unique);
-      // Context note
-      var ctxLabels = ['プライベートな声', '友人との声', '日常会話の声', '発表・配信の声', 'パフォーマンスの声'];
-      var ctxIdx = (ans[0] || 1) - 1;
-      var natLabels = ['', '', '', '', '完全に自然な状態'];
-      var natNote = (ans[1] || 1) >= 4 ? ' ／ ' + natLabels[4] : '';
-      var note = document.getElementById('vf-note');
-      if (note) note.textContent = '解析コンテキスト：' + (ctxLabels[ctxIdx] || '通常') + natNote;
-    }
-    var w  = voiceScore.warmth;
-    var cl = voiceScore.clarity;
-    var cu = voiceScore.cute;
-    var un = voiceScore.unique;
-    var ap = voiceScore.aperiod;
-    var inf = voiceScore.infl;
-    var sc = voiceScore.sc;
-    var zcr = voiceScore.zcr;
-    // Rebuild 8-axis fvec for radar:
-    // [通り, 持続力, 識別性, 息感, 明瞭度, 安定性, 音域, 響き]
-    // → repurpose axes to: [明瞭さ, 温かさ, 独特さ, 息感, 可愛さ, 安定感, 音域感, 響き]
-    function v5(v){ return Math.max(1, Math.min(5, 1 + v * 4)); }
-    fvec = [
-      v5(cl),                      // 明瞭さ
-      v5(w),                       // 温かさ
-      v5(un),                      // 独特さ
-      v5(ap),                      // 息感（breathiness）
-      v5(cu),                      // 可愛さ
-      v5(1 - inf * 0.5),           // 安定感（low inflection = stable）
-      v5(zcr * 0.6 + inf * 0.4),   // 音域感（high zcr + inflection = wide range）
-      v5(sc * 0.5 + w * 0.5)       // 響き（bright warmth）
-    ];
-  }
-};
 
 // Restart: also reset recorder
 var _origRestart = restart;
@@ -2611,19 +2617,29 @@ function toggleDebug() {
 }
 
 function populateDebugPanel() {
+  var panel = document.getElementById('debug-panel');
+  if (!panel) return;
+
+  // ── 音声なしケース ──
   if (!voiceScore) {
-    document.getElementById('dbg-winner').textContent = '音声データなし（スキップされました）';
+    document.getElementById('dbg-winner').textContent =
+      '音声データなし（録音スキップ / 解析失敗）— 判定はランダムです';
     return;
   }
   if (voiceScore._silent) {
     var sw = document.getElementById('debug-silent-warn');
     if (sw) sw.style.display = 'inline';
+    document.getElementById('dbg-winner').textContent = '⚠️ 録音が無音または極端に小さいです';
+    return;
   }
+
+  // ── 特徴量表示 ──
   function setDbg(id, barId, val) {
-    var el = document.getElementById(id);
+    var pct = (val * 100).toFixed(1);
+    var el  = document.getElementById(id);
     var bar = document.getElementById(barId);
-    if (el) el.textContent = (val * 100).toFixed(1) + '%';
-    if (bar) bar.style.width = (val * 100) + '%';
+    if (el)  el.textContent    = pct + '%';
+    if (bar) bar.style.width   = pct + '%';
   }
   setDbg('dbg-zcr',  'dbg-zcr-bar',  voiceScore.zcr);
   setDbg('dbg-sc',   'dbg-sc-bar',   voiceScore.sc);
@@ -2631,57 +2647,90 @@ function populateDebugPanel() {
   setDbg('dbg-tilt', 'dbg-tilt-bar', voiceScore.tilt);
   setDbg('dbg-infl', 'dbg-infl-bar', voiceScore.infl);
   setDbg('dbg-rms',  'dbg-rms-bar',  voiceScore.rms);
-  var bw = voiceScore.warmth, bcl = voiceScore.clarity;
-  var bcu = voiceScore.cute, bun = voiceScore.unique;
-  var zcr = voiceScore.zcr, sc = voiceScore.sc;
-  var ap = voiceScore.aperiod, ti = voiceScore.tilt, inf = voiceScore.infl;
-  var qc = contextQuality;
-  function blend(v,n){return v*qc+n*(1-qc);}
-  bw=blend(bw,0.5); bcl=blend(bcl,0.5); bcu=blend(bcu,0.5); bun=blend(bun,0.5);
-  if (contextMultiplier > 1.0) bcl = Math.min(1, bcl * contextMultiplier);
-  else bw = Math.min(1, bw / contextMultiplier);
-  var typeScores = [
-    bcl*0.40+bw*0.25+(1-bcu)*0.20+(1-bun)*0.15,
-    bw*0.40+(1-zcr)*0.30+ti*0.30,
-    bcu*0.40+bcl*0.30+inf*0.30,
-    bw*0.40+ap*0.35+(1-bcl)*0.25,
-    bun*0.40+ap*0.30+(1-bcl)*0.30,
-    (bcl+bw)*0.40+sc*0.30+(1-bcu)*0.30,
-    bun*0.35+inf*0.35+sc*0.30
+
+  // ── classify() をそのまま再実行して7色スコアを取得 ──
+  // classify() は voiceScore と contextQuality/contextMultiplier を使う
+  var cls = classify(fvec);
+  var winnerName = ['赤・リーダー','橙・ガーディアン','黄・スカウト',
+                    '緑・ヒーラー','青・ミステリアス','紫・カリスマ','藍・トリック'][cls.typeIdx];
+
+  // 7色スコアを再計算（classify内部と同じ式）
+  var zcr=voiceScore.zcr, sc=voiceScore.sc, ap=voiceScore.aperiod;
+  var tilt=voiceScore.tilt, infl=voiceScore.infl, rms=voiceScore.rms;
+  function cl(v){return Math.max(0,Math.min(1,v));}
+  var w  = cl((1-zcr)*0.35 + tilt*0.35 + ap*0.30);
+  var c  = cl(sc*0.40 + rms*0.35 + (1-ap)*0.25);
+  var cu = cl(zcr*0.45 + infl*0.35 + sc*0.20);
+  var dev= Math.abs(zcr-0.5)+Math.abs(sc-0.5)+Math.abs(tilt-0.5);
+  var un = cl(ap*0.35 + Math.min(1,dev/0.8)*0.35 + infl*0.30);
+  var redPen = Math.max(0,(rms-0.92)*5);
+  var scores = [
+    c*0.55+(1-cu)*0.25+(1-redPen)*0.20,
+    w*0.55+(1-zcr)*0.25+tilt*0.20,
+    cu*0.50+infl*0.30+(1-un)*0.20,
+    w*0.35+ap*0.30+tilt*0.35,
+    un*0.50+ap*0.25+(1-sc)*0.25,
+    (rms*rms)*0.60+sc*0.20+c*0.20,
+    infl*0.40+un*0.45+sc*0.15
   ];
-  var typeNames  = ['赤・リーダー','橙・ガーディアン','黄・スカウト','緑・ヒーラー','青・ミステリアス','紫・カリスマ','藍・トリック'];
+  var typeNames  = ['赤・リーダー','橙・ガーディアン','黄・スカウト',
+                    '緑・ヒーラー','青・ミステリアス','紫・カリスマ','藍・トリック'];
   var typeColors = ['#E85252','#F5923A','#D4B020','#4AAA5E','#4A7AC8','#9B6ED4','#5A6AD4'];
-  var maxS = Math.max.apply(null, typeScores);
-  var winnerIdx = typeScores.indexOf(maxS);
+  var maxS = Math.max.apply(null, scores);
+
+  // ── 7色スコア表示 ──
   var scoresEl = document.getElementById('dbg-type-scores');
   scoresEl.innerHTML = '';
   for (var i = 0; i < 7; i++) {
+    var isWinner = (scores[i] === maxS);
     var row = document.createElement('div');
     row.className = 'debug-score-row';
-    var pct = maxS > 0 ? (typeScores[i] / maxS * 100) : 0;
-    row.innerHTML = '<div class="debug-score-name">'+typeNames[i]+'</div>'+
-      '<div class="debug-score-bar-track"><div class="debug-score-bar" style="width:'+pct.toFixed(1)+'%;background:'+typeColors[i]+'"></div></div>'+
-      '<div class="debug-score-val">'+(typeScores[i]*100).toFixed(1)+'</div>';
+    var pct = maxS > 0 ? (scores[i]/maxS*100) : 0;
+    row.style.fontWeight = isWinner ? '900' : 'normal';
+    row.innerHTML =
+      '<div class="debug-score-name" style="color:' + (isWinner ? typeColors[i] : 'rgba(255,255,255,.4)') + '">' +
+        (isWinner ? '▶ ' : '') + typeNames[i] + '</div>' +
+      '<div class="debug-score-bar-track"><div class="debug-score-bar" style="width:' +
+        pct.toFixed(1) + '%;background:' + typeColors[i] + '"></div></div>' +
+      '<div class="debug-score-val" style="color:' + (isWinner ? '#fff' : '') + '">' +
+        (scores[i]*100).toFixed(1) + '</div>';
     scoresEl.appendChild(row);
   }
-  var winText = '判定: '+typeNames[winnerIdx]+' ('+( maxS*100).toFixed(1)+'pt)';
-  if (curRes) winText += ' ／ 確信度: '+curRes.confidence+'%';
-  document.getElementById('dbg-winner').textContent = winText;
+
+  // ── 加点内訳 ──
+  var breakdown = [
+    '明瞭さ=' + (c*100).toFixed(0) + '% | 音量=' + (rms*100).toFixed(0) + '%',
+    '温かさ=' + (w*100).toFixed(0) + '% | 低音域=' + ((1-zcr)*100).toFixed(0) + '%',
+    '可愛さ=' + (cu*100).toFixed(0) + '% | 抑揚=' + (infl*100).toFixed(0) + '%',
+    '温かさ=' + (w*100).toFixed(0) + '% | 息感=' + (ap*100).toFixed(0) + '% | 柔='+  (tilt*100).toFixed(0) + '%',
+    '独特さ=' + (un*100).toFixed(0) + '% | 息感=' + (ap*100).toFixed(0) + '% | 暗='  + ((1-sc)*100).toFixed(0) + '%',
+    'RMS²=' + (rms*rms*100).toFixed(0) + '% | 明=' + (sc*100).toFixed(0) + '%',
+    '抑揚=' + (infl*100).toFixed(0) + '% | 独=' + (un*100).toFixed(0) + '% | 明=' + (sc*100).toFixed(0) + '%'
+  ];
+  var winIdx = scores.indexOf(maxS);
+  document.getElementById('dbg-winner').textContent =
+    '▶ 判定: ' + typeNames[winIdx] + ' | スコア: ' + (maxS*100).toFixed(1) +
+    ' | 確信度: ' + (curRes ? curRes.confidence : '--') + '% | ' + breakdown[winIdx];
+
+  // ── 4軸スコア ──
   var axisEl = document.getElementById('dbg-axis-scores');
   axisEl.innerHTML = '';
-  var axes = [
-    {n:'温かさ',v:voiceScore.warmth,c:'#F5923A'},
-    {n:'明瞭さ',v:voiceScore.clarity,c:'#4A7AC8'},
-    {n:'可愛さ',v:voiceScore.cute,c:'#D4B020'},
-    {n:'独特さ',v:voiceScore.unique,c:'#9B6ED4'}
-  ];
+  var axes = [{n:'温かさ(warmth)',v:w,c:'#F5923A'},{n:'明瞭さ(clarity)',v:c,c:'#4A7AC8'},
+              {n:'可愛さ(cute)',v:cu,c:'#D4B020'},{n:'独特さ(unique)',v:un,c:'#9B6ED4'}];
   for (var i = 0; i < axes.length; i++) {
     var row = document.createElement('div');
     row.className = 'debug-score-row';
-    row.innerHTML = '<div class="debug-score-name">'+axes[i].n+'</div>'+
-      '<div class="debug-score-bar-track"><div class="debug-score-bar" style="width:'+(axes[i].v*100).toFixed(1)+'%;background:'+axes[i].c+'"></div></div>'+
-      '<div class="debug-score-val">'+(axes[i].v*100).toFixed(1)+'</div>';
+    row.innerHTML = '<div class="debug-score-name">' + axes[i].n + '</div>' +
+      '<div class="debug-score-bar-track"><div class="debug-score-bar" style="width:' +
+        (axes[i].v*100).toFixed(1) + '%;background:' + axes[i].c + '"></div></div>' +
+      '<div class="debug-score-val">' + (axes[i].v*100).toFixed(1) + '</div>';
     axisEl.appendChild(row);
+  }
+
+  // ── contextQuality表示 ──
+  var ctxEl = document.getElementById('dbg-winner');
+  if (ctxEl) {
+    ctxEl.textContent += ' | 録音品質補正: ' + (contextQuality*100).toFixed(0) + '%';
   }
 }
 
