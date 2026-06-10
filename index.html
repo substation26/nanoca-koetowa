@@ -992,7 +992,7 @@ body{font-family:'Zen Maru Gothic','Noto Sans JP',sans-serif;background:#0E0818;
 
 /* ===== DEBUG PANEL ===== */
 .debug-panel {
-  display: none;
+  display: block;
   margin: 20px auto; max-width: 600px;
   background: rgba(0,0,0,.6);
   border: 1px solid rgba(155,110,212,.4);
@@ -1143,6 +1143,17 @@ body{font-family:'Zen Maru Gothic','Noto Sans JP',sans-serif;background:#0E0818;
 .vf-label-desc {
   font-size: .55rem; color: rgba(255,255,255,.3); line-height: 1.3;
 }
+
+/* ===== 簡易説明ラベル ===== */
+.vf-simple-desc {
+  font-size: .65rem;
+  color: rgba(255,255,255,.45);
+  margin-top: 3px;
+  font-weight: 700;
+}
+.vf-row { align-items: flex-start; }
+.vf-center { flex: 1; min-width: 0; }
+.vf-bar-track { margin-top: 4px; }
 </style>
 </head>
 <body>
@@ -1354,13 +1365,16 @@ body{font-family:'Zen Maru Gothic','Noto Sans JP',sans-serif;background:#0E0818;
 
         <!-- Voice Feature Bars -->
         <div class="voice-feat-wrap" id="voice-feat-wrap" style="display:none">
-          <div class="vf-title">✦ あなたの声の特徴（音声解析結果）</div>
+          <div class="vf-title">🎙️ 声の特徴マップ（4軸解析）</div>
           <div class="vf-row">
             <div class="vf-label-col">
               <span class="vf-label-main">🌡️ 温かさ</span>
               <span class="vf-label-desc">安心感・包容力<br>（HNR・声帯振動）</span>
             </div>
-            <div class="vf-bar-track"><div class="vf-bar-fill" id="vf-warmth"></div></div>
+            <div class="vf-center">
+              <div class="vf-bar-track"><div class="vf-bar-fill" id="vf-warmth"></div></div>
+              <div class="vf-simple-desc" id="vf-warmth-desc"></div>
+            </div>
             <div class="vf-val" id="vf-warmth-val">--</div>
           </div>
           <div class="vf-row">
@@ -1368,7 +1382,10 @@ body{font-family:'Zen Maru Gothic','Noto Sans JP',sans-serif;background:#0E0818;
               <span class="vf-label-main">✨ 明瞭さ</span>
               <span class="vf-label-desc">聞き取りやすさ<br>（Spectral Centroid・音量）</span>
             </div>
-            <div class="vf-bar-track"><div class="vf-bar-fill" id="vf-clarity"></div></div>
+            <div class="vf-center">
+              <div class="vf-bar-track"><div class="vf-bar-fill" id="vf-clarity"></div></div>
+              <div class="vf-simple-desc" id="vf-clarity-desc"></div>
+            </div>
             <div class="vf-val" id="vf-clarity-val">--</div>
           </div>
           <div class="vf-row">
@@ -1376,7 +1393,10 @@ body{font-family:'Zen Maru Gothic','Noto Sans JP',sans-serif;background:#0E0818;
               <span class="vf-label-main">🌸 可愛さ</span>
               <span class="vf-label-desc">親しみやすさ<br>（F0・声帯振動）</span>
             </div>
-            <div class="vf-bar-track"><div class="vf-bar-fill" id="vf-cute"></div></div>
+            <div class="vf-center">
+              <div class="vf-bar-track"><div class="vf-bar-fill" id="vf-cute"></div></div>
+              <div class="vf-simple-desc" id="vf-cute-desc"></div>
+            </div>
             <div class="vf-val" id="vf-cute-val">--</div>
           </div>
           <div class="vf-row">
@@ -1384,7 +1404,10 @@ body{font-family:'Zen Maru Gothic','Noto Sans JP',sans-serif;background:#0E0818;
               <span class="vf-label-main">💎 独特さ</span>
               <span class="vf-label-desc">耳に残る個性<br>（Formant Variation）</span>
             </div>
-            <div class="vf-bar-track"><div class="vf-bar-fill" id="vf-unique"></div></div>
+            <div class="vf-center">
+              <div class="vf-bar-track"><div class="vf-bar-fill" id="vf-unique"></div></div>
+              <div class="vf-simple-desc" id="vf-unique-desc"></div>
+            </div>
             <div class="vf-val" id="vf-unique-val">--</div>
           </div>
           <div class="vf-note" id="vf-note"></div>
@@ -1418,10 +1441,10 @@ body{font-family:'Zen Maru Gothic','Noto Sans JP',sans-serif;background:#0E0818;
     </div>
     
     <!-- Debug Panel -->
-    <button class="debug-toggle-btn" onclick="toggleDebug()">🔬 音声解析デバッグ情報を表示</button>
+    <button class="debug-toggle-btn" onclick="toggleDebug()">▲ 分析を隠す</button>
     <div class="debug-panel" id="debug-panel">
       <div class="debug-title">
-        <span>🔬 音声解析デバッグ</span>
+        <span>🔬 あなたの声をこう分析しました</span>
         <span id="debug-silent-warn" style="color:#E85252;display:none">⚠️ 音声がほぼ無音</span>
       </div>
       <div class="debug-grid">
@@ -1471,20 +1494,15 @@ body{font-family:'Zen Maru Gothic','Noto Sans JP',sans-serif;background:#0E0818;
           <div class="debug-bar-wrap"><div class="debug-bar" id="dbg-rms-bar"></div></div>
         </div>
       </div>
-      <div class="debug-scores">
-        <div class="debug-key" style="margin-bottom:8px;font-size:.6rem">タイプ別スコア（高いほど一致）</div>
-        <div id="dbg-type-scores"></div>
-        <div class="debug-winner" id="dbg-winner"></div>
-      </div>
-      <div class="debug-scores" style="margin-top:10px">
-        <div class="debug-key" style="margin-bottom:6px;font-size:.6rem">4軸スコア</div>
-        <div id="dbg-axis-scores"></div>
-      </div>
-      <div style="margin-top:10px;font-size:.62rem;color:rgba(255,255,255,.25);line-height:1.6;">
-        録音するたびに数値が変わることを確認してください。<br>
-        数値が毎回同じ場合は音声解析が機能していません。
-      </div>
+      <!-- Debug analysis steps etc -->
+    </div>
+  </div>
+</div>
+
+<div class="toast" id="toast"></div>
+
 <script>
+
 // ============================================================
 // IP DATA — 声キャラ7色診断™ キャラクター定義
 // © nanoca Inc. — 将来のIP展開用内部データ
@@ -2317,13 +2335,30 @@ function showResult() {
         var pct = Math.round(v * 100);
         var el  = document.getElementById(id);
         var vel = document.getElementById(valId);
-        if (el)  el.style.width     = pct + '%';
-        if (vel) vel.textContent    = pct + '%';
+        if (el)  el.style.width  = pct + '%';
+        if (vel) vel.textContent = pct + '%';
+      }
+      function simpleDesc(v) {
+        if (v >= 0.75) return '→ かなり強め';
+        if (v >= 0.60) return '→ 平均より高め';
+        if (v >= 0.40) return '→ 標準的';
+        if (v >= 0.25) return '→ やや低め';
+        return '→ 控えめ';
+      }
+      function setDesc(descId, v) {
+        var el = document.getElementById(descId);
+        if (el) el.textContent = simpleDesc(v);
       }
       setPct('vf-warmth',  'vf-warmth-val',  voiceScore.warmth);
       setPct('vf-clarity', 'vf-clarity-val', voiceScore.clarity);
       setPct('vf-cute',    'vf-cute-val',    voiceScore.cute);
       setPct('vf-unique',  'vf-unique-val',  voiceScore.unique);
+      setDesc('vf-warmth-desc',  voiceScore.warmth);
+      setDesc('vf-clarity-desc', voiceScore.clarity);
+      setDesc('vf-cute-desc',    voiceScore.cute);
+      setDesc('vf-unique-desc',  voiceScore.unique);
+      // ⑥ パーセンタイル拡張ポイント（将来: percentileData があれば表示）
+      // if (window.percentileData) showPercentile(voiceScore);
 
       var ctxLabels = ['プライベートな声','友人との声','日常会話の声','発表・配信の声','パフォーマンスの声'];
       var ctxIdx    = Math.max(0, (ans[0] || 1) - 1);
@@ -2362,8 +2397,8 @@ function showResult() {
   document.getElementById('prog-bar').style.width = '100%';
   setTimeout(function(){ drawRadar(fvec, r.c1); }, 300);
   document.getElementById('result-sec').scrollIntoView({behavior:'smooth', block:'start'});
-  // Auto-populate debug if already open
-  if (debugVisible) populateDebugPanel();
+  // 常にデバッグパネルを更新
+  populateDebugPanel();
 }
 
 var curSceneIdx = 0;
@@ -2409,11 +2444,33 @@ function stars(v){var s='',n=Math.round(v);for(var i=0;i<5;i++) s+=(i<n?'★':'�
 function getTxt(){
   if(!curRes) return '';
   var fv=curRes.fvec||[3,3,3,3,3,3,3,3];
-  var lines=['🎙️ 声キャラ7色診断','','「'+curRes.name+'」',curRes.en,'確信度：'+curRes.confidence+'%','','▼ 私の声の特性','├ 声の通り：'+stars(fv[0]),'├ 持続力：'+stars(fv[1]),'├ 息感：'+stars(fv[3]),'├ 明瞭度：'+stars(fv[4]),'└ 音域：'+stars(fv[6]),'','#コエトワ #声質診断 #声キャラ7色診断'];
+  var url = location.href || 'https://substation26.github.io/nanoca-koetowa';
+  var lines=[
+    '🎙️ 声キャラ7色診断 | nanoca Inc.',
+    '',
+    '「'+curRes.name+'」',
+    curRes.catch || curRes.en,
+    '確信度：'+curRes.confidence+'%',
+    '',
+    '▼ 私の声の特性',
+    '├ 温かさ：' +stars(fv[1]),
+    '├ 明瞭さ：' +stars(fv[0]),
+    '├ 可愛さ：' +stars(fv[4]),
+    '└ 独特さ：' +stars(fv[2]),
+    '',
+    '#声キャラ7色診断 #コエトワ #nanoca',
+    '',
+    url
+  ];
   return lines.join('\n');
 }
 function shareX(){window.open('https://twitter.com/intent/tweet?text='+encodeURIComponent(getTxt()),'_blank');}
-function shareLine(){window.open('https://social-plugins.line.me/lineit/share?url=https://koetowa.jp&text='+encodeURIComponent(getTxt()),'_blank');}
+function shareLine(){
+  var txt = getTxt();
+  // LINE現行API: text パラメータにURL込みのテキストを渡す
+  var lineUrl = 'https://line.me/R/share?text=' + encodeURIComponent(txt);
+  window.open(lineUrl, '_blank');
+}
 function copyResult(){
   navigator.clipboard.writeText(getTxt()).then(function(){
     var btn=document.getElementById('copy-btn');
@@ -2908,14 +2965,14 @@ restart = function() {
 // ============================================================
 // DEBUG PANEL
 // ============================================================
-var debugVisible = false;
+var debugVisible = true;
 
 function toggleDebug() {
   debugVisible = !debugVisible;
   var panel = document.getElementById('debug-panel');
   if (panel) panel.classList.toggle('show', debugVisible);
   var btn = document.querySelector('.debug-toggle-btn');
-  if (btn) btn.textContent = debugVisible ? 'デバッグ情報を隠す' : 'デバッグ情報を表示';
+  if (btn) btn.textContent = debugVisible ? '分析を隠す' : '🔬 あなたの声をこう分析しました';
   if (debugVisible) populateDebugPanel();
 }
 
@@ -2924,18 +2981,18 @@ function populateDebugPanel() {
   if (!panel) return;
 
   if (!voiceScore) {
-    document.getElementById('dbg-winner').textContent =
-      '音声データなし（録音スキップ）— 判定はランダムです';
+    var wd = document.getElementById('dbg-winner');
+    if (wd) wd.textContent = '音声データなし（録音スキップ）';
     return;
   }
   if (voiceScore._silent) {
     var sw = document.getElementById('debug-silent-warn');
     if (sw) sw.style.display = 'inline';
-    document.getElementById('dbg-winner').textContent = '⚠️ 録音が無音または極端に小さいです';
+    var wd2 = document.getElementById('dbg-winner');
+    if (wd2) wd2.textContent = '⚠️ 録音が無音または極端に小さいです';
     return;
   }
 
-  // ── 特徴量バー表示 ──
   function setDbg(id, barId, val) {
     var pct = ((val || 0) * 100).toFixed(1);
     var el  = document.getElementById(id);
@@ -2943,25 +3000,24 @@ function populateDebugPanel() {
     if (el)  el.textContent  = pct + '%';
     if (bar) bar.style.width = pct + '%';
   }
-  setDbg('dbg-zcr',  'dbg-zcr-bar',  voiceScore.zcr   || 0);
-  setDbg('dbg-sc',   'dbg-sc-bar',   voiceScore.sc    || 0);
+  setDbg('dbg-zcr',  'dbg-zcr-bar',  voiceScore.zcr    || 0);
+  setDbg('dbg-sc',   'dbg-sc-bar',   voiceScore.sc     || 0);
   setDbg('dbg-ap',   'dbg-ap-bar',   voiceScore.breath || voiceScore.aperiod || 0);
-  setDbg('dbg-tilt', 'dbg-tilt-bar', voiceScore.tilt  || 0);
-  setDbg('dbg-infl', 'dbg-infl-bar', voiceScore.infl  || 0);
-  setDbg('dbg-rms',  'dbg-rms-bar',  voiceScore.rms   || 0);
-  setDbg('dbg-hfr',  'dbg-hfr-bar',  voiceScore.hfr   || 0);
-  setDbg('dbg-pvar', 'dbg-pvar-bar', voiceScore.pvar  || 0);
-  setDbg('dbg-flux', 'dbg-flux-bar', voiceScore.flux  || 0);
+  setDbg('dbg-tilt', 'dbg-tilt-bar', voiceScore.tilt   || 0);
+  setDbg('dbg-infl', 'dbg-infl-bar', voiceScore.infl   || 0);
+  setDbg('dbg-rms',  'dbg-rms-bar',  voiceScore.rms    || 0);
+  setDbg('dbg-hfr',  'dbg-hfr-bar',  voiceScore.hfr    || 0);
+  setDbg('dbg-pvar', 'dbg-pvar-bar', voiceScore.pvar   || 0);
+  setDbg('dbg-flux', 'dbg-flux-bar', voiceScore.flux   || 0);
 
-  // ── 7色スコア計算（v9b と同じ式、全変数を voiceScore から明示取得）──
-  function cl(v){ return Math.max(0, Math.min(1, isNaN(v) ? 0 : v)); }
+  function cl(v){ return Math.max(0, Math.min(1, isNaN(v) ? 0 : Number(v))); }
 
   var zcr    = voiceScore.zcr    || 0;
   var sc     = voiceScore.sc     || 0;
   var tilt   = voiceScore.tilt   || 0;
   var infl   = voiceScore.infl   || 0;
   var rms    = voiceScore.rms    || 0;
-  var hnr    = voiceScore.hnr    || 0.5;
+  var hnr    = voiceScore.hnr    !== undefined ? voiceScore.hnr : 0.5;
   var breath = voiceScore.breath || 0;
   var hfr    = voiceScore.hfr    || 0;
   var flux   = voiceScore.flux   || 0;
@@ -2974,12 +3030,12 @@ function populateDebugPanel() {
   var un = cl(breath*0.30 + pvar*0.30 + flux*0.20 + Math.min(1,dv/0.8)*0.20);
 
   var scores = [
-    cl(Math.pow(c,0.6)      * Math.pow(rms,0.4)    * 0.75 + (1-breath)*0.25),
-    cl(Math.pow(1-zcr,0.5)  * Math.pow(hnr,0.5)    * 0.70 + tilt*0.30),
-    cl(Math.pow(zcr,0.5)    * Math.pow(cu,0.5)     * 0.65 + pvar*0.20 + sc*0.15),
-    cl(Math.pow(tilt,0.5)   * Math.pow(hnr,0.5)    * 0.60 + w*0.40),
-    cl(Math.pow(breath,0.5) * Math.pow(1-hnr,0.5)  * 0.70 + un*0.30),
-    cl(Math.pow(rms,2.5)                            * 0.75 + c*0.25),
+    cl(Math.pow(c,0.6)      * Math.pow(rms,0.4)   * 0.75 + (1-breath)*0.25),
+    cl(Math.pow(1-zcr,0.5)  * Math.pow(hnr,0.5)   * 0.70 + tilt*0.30),
+    cl(Math.pow(zcr,0.5)    * Math.pow(cu,0.5)    * 0.65 + pvar*0.20 + sc*0.15),
+    cl(Math.pow(tilt,0.5)   * Math.pow(hnr,0.5)   * 0.60 + w*0.40),
+    cl(Math.pow(breath,0.5) * Math.pow(1-hnr,0.5) * 0.70 + un*0.30),
+    cl(Math.pow(rms,2.5)                           * 0.75 + c*0.25),
     cl(flux*0.50 + un*0.30 + pvar*0.20),
   ];
 
@@ -2989,29 +3045,34 @@ function populateDebugPanel() {
   var maxS   = Math.max.apply(null, scores);
   var winIdx = scores.indexOf(maxS);
 
-  // ── 7色スコアバー ──
   var scoresEl = document.getElementById('dbg-type-scores');
   if (scoresEl) {
     scoresEl.innerHTML = '';
-    for (var i = 0; i < 7; i++) {
-      var isWin = (i === winIdx);
-      var pct   = maxS > 0 ? (scores[i] / maxS * 100) : 0;
-      var row   = document.createElement('div');
-      row.className    = 'debug-score-row';
-      row.style.fontWeight = isWin ? '900' : 'normal';
-      row.innerHTML =
-        '<div class="debug-score-name" style="color:' +
-          (isWin ? typeColors[i] : 'rgba(255,255,255,.4)') + '">' +
-          (isWin ? '▶ ' : '') + typeNames[i] + '</div>' +
-        '<div class="debug-score-bar-track"><div class="debug-score-bar" style="width:' +
-          pct.toFixed(1) + '%;background:' + typeColors[i] + '"></div></div>' +
-        '<div class="debug-score-val" style="color:' + (isWin ? '#fff' : '') + '">' +
-          (scores[i]*100).toFixed(1) + '</div>';
-      scoresEl.appendChild(row);
+    var validScores = maxS > 0 && scores.every(function(s){
+      return typeof s === 'number' && !isNaN(s);
+    });
+    if (!validScores) {
+      scoresEl.innerHTML = '<div style="font-size:.72rem;color:rgba(255,255,255,.3);padding:8px">（音声録音後に表示されます）</div>';
+    } else {
+      for (var i = 0; i < 7; i++) {
+        var isWin = (i === winIdx);
+        var pct   = scores[i] / maxS * 100;
+        var row   = document.createElement('div');
+        row.className = 'debug-score-row';
+        row.style.fontWeight = isWin ? '900' : 'normal';
+        row.innerHTML =
+          '<div class="debug-score-name" style="color:' +
+            (isWin ? typeColors[i] : 'rgba(255,255,255,.4)') + '">' +
+            (isWin ? '▶ ' : '') + typeNames[i] + '</div>' +
+          '<div class="debug-score-bar-track"><div class="debug-score-bar" style="width:' +
+            pct.toFixed(1) + '%;background:' + typeColors[i] + '"></div></div>' +
+          '<div class="debug-score-val" style="color:' + (isWin ? '#fff' : '') + '">' +
+            (scores[i]*100).toFixed(1) + '</div>';
+        scoresEl.appendChild(row);
+      }
     }
   }
 
-  // ── 判定理由サマリ ──
   var winEl = document.getElementById('dbg-winner');
   if (winEl) {
     winEl.textContent = '▶ 判定: ' + typeNames[winIdx] +
@@ -3020,15 +3081,14 @@ function populateDebugPanel() {
       ' | 録音品質: ' + (contextQuality*100).toFixed(0) + '%';
   }
 
-  // ── 4軸スコア ──
   var axisEl = document.getElementById('dbg-axis-scores');
   if (axisEl) {
     axisEl.innerHTML = '';
     var axes = [
-      {n:'温かさ(warmth)',  v:w,  c:'#F5923A'},
-      {n:'明瞭さ(clarity)', v:c,  c:'#4A7AC8'},
-      {n:'可愛さ(cute)',    v:cu, c:'#D4B020'},
-      {n:'独特さ(unique)',  v:un, c:'#9B6ED4'},
+      {n:'温かさ(warmth)',   v:w,  c:'#F5923A'},
+      {n:'明瞭さ(clarity)',  v:c,  c:'#4A7AC8'},
+      {n:'可愛さ(cute)',     v:cu, c:'#D4B020'},
+      {n:'独特さ(unique)',   v:un, c:'#9B6ED4'},
     ];
     for (var i = 0; i < axes.length; i++) {
       var row = document.createElement('div');
