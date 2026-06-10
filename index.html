@@ -1154,6 +1154,16 @@ body{font-family:'Zen Maru Gothic','Noto Sans JP',sans-serif;background:#0E0818;
 .vf-row { align-items: flex-start; }
 .vf-center { flex: 1; min-width: 0; }
 .vf-bar-track { margin-top: 4px; }
+
+/* ===== パーセンタイル（将来の拡張） ===== */
+.vf-percentile {
+  font-size: .58rem;
+  color: rgba(155,110,212,.7);
+  font-weight: 900;
+  margin-left: 4px;
+  display: none; /* データ蓄積後に有効化 */
+}
+.vf-percentile.active { display: inline; }
 </style>
 </head>
 <body>
@@ -1375,7 +1385,7 @@ body{font-family:'Zen Maru Gothic','Noto Sans JP',sans-serif;background:#0E0818;
               <div class="vf-bar-track"><div class="vf-bar-fill" id="vf-warmth"></div></div>
               <div class="vf-simple-desc" id="vf-warmth-desc"></div>
             </div>
-            <div class="vf-val" id="vf-warmth-val">--</div>
+            <div class="vf-val" id="vf-warmth-val">--<span class="vf-percentile" id="vf-warmth-pct"></span></div>
           </div>
           <div class="vf-row">
             <div class="vf-label-col">
@@ -1386,7 +1396,7 @@ body{font-family:'Zen Maru Gothic','Noto Sans JP',sans-serif;background:#0E0818;
               <div class="vf-bar-track"><div class="vf-bar-fill" id="vf-clarity"></div></div>
               <div class="vf-simple-desc" id="vf-clarity-desc"></div>
             </div>
-            <div class="vf-val" id="vf-clarity-val">--</div>
+            <div class="vf-val" id="vf-clarity-val">--<span class="vf-percentile" id="vf-clarity-pct"></span></div>
           </div>
           <div class="vf-row">
             <div class="vf-label-col">
@@ -1397,7 +1407,7 @@ body{font-family:'Zen Maru Gothic','Noto Sans JP',sans-serif;background:#0E0818;
               <div class="vf-bar-track"><div class="vf-bar-fill" id="vf-cute"></div></div>
               <div class="vf-simple-desc" id="vf-cute-desc"></div>
             </div>
-            <div class="vf-val" id="vf-cute-val">--</div>
+            <div class="vf-val" id="vf-cute-val">--<span class="vf-percentile" id="vf-cute-pct"></span></div>
           </div>
           <div class="vf-row">
             <div class="vf-label-col">
@@ -1408,7 +1418,29 @@ body{font-family:'Zen Maru Gothic','Noto Sans JP',sans-serif;background:#0E0818;
               <div class="vf-bar-track"><div class="vf-bar-fill" id="vf-unique"></div></div>
               <div class="vf-simple-desc" id="vf-unique-desc"></div>
             </div>
-            <div class="vf-val" id="vf-unique-val">--</div>
+            <div class="vf-val" id="vf-unique-val">--<span class="vf-percentile" id="vf-unique-pct"></span></div>
+          </div>
+          <div class="vf-row">
+            <div class="vf-label-col">
+              <span class="vf-label-main">🌿 柔らかさ</span>
+              <span class="vf-label-desc">包容力・穏やかさ<br>（Spectral Tilt）</span>
+            </div>
+            <div class="vf-center">
+              <div class="vf-bar-track"><div class="vf-bar-fill" id="vf-soft"></div></div>
+              <div class="vf-simple-desc" id="vf-soft-desc"></div>
+            </div>
+            <div class="vf-val" id="vf-soft-val">--<span class="vf-percentile" id="vf-soft-pct"></span></div>
+          </div>
+          <div class="vf-row">
+            <div class="vf-label-col">
+              <span class="vf-label-main">🔒 安定感</span>
+              <span class="vf-label-desc">声の安定・信頼感<br>（HNR）</span>
+            </div>
+            <div class="vf-center">
+              <div class="vf-bar-track"><div class="vf-bar-fill" id="vf-stable"></div></div>
+              <div class="vf-simple-desc" id="vf-stable-desc"></div>
+            </div>
+            <div class="vf-val" id="vf-stable-val">--<span class="vf-percentile" id="vf-stable-pct"></span></div>
           </div>
           <div class="vf-note" id="vf-note"></div>
         </div>
@@ -1449,58 +1481,19 @@ body{font-family:'Zen Maru Gothic','Noto Sans JP',sans-serif;background:#0E0818;
       </div>
       <div class="debug-grid">
         <div class="debug-item">
-          <div class="debug-key">F0 (声の高さ) ZCR</div>
+          <div class="debug-key" style="line-height:1.5">F0（基本周波数）<br>→ 声の高さ・低さ</div>
           <div class="debug-val" id="dbg-zcr">--</div>
           <div class="debug-bar-wrap"><div class="debug-bar" id="dbg-zcr-bar"></div></div>
         </div>
         <div class="debug-item">
-          <div class="debug-key">スペクトル重心 (明るさ)</div>
+          <div class="debug-key" style="line-height:1.5">Spectral Centroid<br>→ 声の明るさ・暗さ</div>
           <div class="debug-val" id="dbg-sc">--</div>
           <div class="debug-bar-wrap"><div class="debug-bar" id="dbg-sc-bar"></div></div>
         </div>
         <div class="debug-item">
-          <div class="debug-key">息感 Breathiness (HNR)</div>
+          <div class="debug-key" style="line-height:1.5">Breathiness（息感）<br>→ 息っぽさ・ハスキー感</div>
           <div class="debug-val" id="dbg-ap">--</div>
-          <div class="debug-bar-wrap"><div class="debug-bar" id="dbg-ap-bar"></div></div>
-        </div>
-        <div class="debug-item">
-          <div class="debug-key">高域比率 HFR (ウィスパー)</div>
-          <div class="debug-val" id="dbg-hfr">--</div>
-          <div class="debug-bar-wrap"><div class="debug-bar" id="dbg-hfr-bar"></div></div>
-        </div>
-        <div class="debug-item">
-          <div class="debug-key">ピッチ変動 PVar (抑揚)</div>
-          <div class="debug-val" id="dbg-pvar">--</div>
-          <div class="debug-bar-wrap"><div class="debug-bar" id="dbg-pvar-bar"></div></div>
-        </div>
-        <div class="debug-item">
-          <div class="debug-key">スペクトル変化 Flux</div>
-          <div class="debug-val" id="dbg-flux">--</div>
-          <div class="debug-bar-wrap"><div class="debug-bar" id="dbg-flux-bar"></div></div>
-        </div>
-        <div class="debug-item">
-          <div class="debug-key">スペクトル傾斜 (柔らかさ)</div>
-          <div class="debug-val" id="dbg-tilt">--</div>
-          <div class="debug-bar-wrap"><div class="debug-bar" id="dbg-tilt-bar"></div></div>
-        </div>
-        <div class="debug-item">
-          <div class="debug-key">抑揚変化 (Inflection)</div>
-          <div class="debug-val" id="dbg-infl">--</div>
-          <div class="debug-bar-wrap"><div class="debug-bar" id="dbg-infl-bar"></div></div>
-        </div>
-        <div class="debug-item">
-          <div class="debug-key">音量 (RMS)</div>
-          <div class="debug-val" id="dbg-rms">--</div>
-          <div class="debug-bar-wrap"><div class="debug-bar" id="dbg-rms-bar"></div></div>
-        </div>
-      </div>
-      <!-- Debug analysis steps etc -->
-    </div>
-  </div>
-</div>
-
-<div class="toast" id="toast"></div>
-
+          <div class="debug-bar-wrap"><div class="debug-bar" id="db
 <script>
 
 // ============================================================
@@ -2184,22 +2177,40 @@ function renderNearTypes(cls) {
   var typeColors = ['#E85252','#F5923A','#D4B020','#4AAA5E','#4A7AC8','#9B6ED4','#5A6AD4'];
   var typeEmoji  = ['⚔️','🛡️','⭐','💚','🗡️','✨','🎭'];
 
-  // sort scores descending, take 2nd and 3rd
+  // 各タイプの「主要特徴」— 差分説明に使う
+  var typeKeyFeature = ['明瞭さ','安定感','可愛さ','柔らかさ','息感','声の強さ','声の変化量'];
+
   var indexed = cls.scores.map(function(s,i){return {s:s,i:i};});
   indexed.sort(function(a,b){return b.s-a.s;});
+  var winnerId    = indexed[0].i;
+  var winnerKey   = typeKeyFeature[winnerId];
+  var winnerName  = typeNames[winnerId];
 
   row.innerHTML = '';
   for (var k = 1; k <= 2; k++) {
     if (!indexed[k]) continue;
-    var t = indexed[k];
-    var diff = Math.round((indexed[0].s - t.s) * 100);
+    var t     = indexed[k];
+    var diff  = Math.round((indexed[0].s - t.s) * 100);
+    var rival = typeNames[t.i];
+    var rivalKey = typeKeyFeature[t.i];
+
+    // 差分理由: 勝者の主要特徴 vs ライバルの主要特徴
+    var reason = winnerKey + 'が' + rival.replace('の','型の') + 'より高かったため';
+
     var chip = document.createElement('div');
     chip.className = 'near-type-chip';
     chip.style.borderColor = typeColors[t.i] + '44';
+    chip.style.flexDirection = 'column';
+    chip.style.alignItems    = 'flex-start';
+    chip.style.gap           = '3px';
     chip.innerHTML =
-      '<div class="nt-dot" style="background:' + typeColors[t.i] + '"></div>' +
-      typeEmoji[t.i] + ' ' + typeNames[t.i] +
-      '<span class="nt-score">-' + diff + 'pt</span>';
+      '<div style="display:flex;align-items:center;gap:5px">' +
+        '<div class="nt-dot" style="background:' + typeColors[t.i] + '"></div>' +
+        typeEmoji[t.i] + ' ' + rival +
+        '<span class="nt-score">-' + diff + 'pt</span>' +
+      '</div>' +
+      '<div style="font-size:.6rem;color:rgba(255,255,255,.35);padding-left:13px">' +
+        reason + '</div>';
     row.appendChild(chip);
   }
   wrap.style.display = 'block';
@@ -2214,42 +2225,59 @@ function renderReason(cls, vs) {
   var note = document.getElementById('reason-note');
   if (!wrap || !rows || !vs || vs._silent) return;
 
-  // v9b の式に対応した加点内訳
-  var zcr=vs.zcr,sc=vs.sc,tilt=vs.tilt,infl=vs.infl,rms=vs.rms;
-  var hnr=vs.hnr,breath=vs.breath,hfr=vs.hfr,flux=vs.flux,pvar=vs.pvar;
+  var zcr=vs.zcr||0, sc2=vs.sc||0, tilt=vs.tilt||0, infl=vs.infl||0;
+  var rms=vs.rms||0, hnr=vs.hnr||0.5, breath=vs.breath||0;
+  var flux=vs.flux||0, pvar=vs.pvar||0;
   function cl(v){return Math.max(0,Math.min(1,v));}
-  var w  = cl(hnr*0.35+tilt*0.35+(1-hfr)*0.30);
-  var c  = cl(sc*0.35+rms*0.35+hnr*0.30);
-  var cu = cl(zcr*0.40+infl*0.35+sc*0.25);
-  var dv = Math.abs(zcr-0.5)+Math.abs(sc-0.5)+Math.abs(tilt-0.5);
+  var w  = cl(hnr*0.35+tilt*0.35+(1-(vs.hfr||0))*0.30);
+  var c  = cl(sc2*0.35+rms*0.35+hnr*0.30);
+  var cu = cl(zcr*0.40+infl*0.35+sc2*0.25);
+  var dv = Math.abs(zcr-0.5)+Math.abs(sc2-0.5)+Math.abs(tilt-0.5);
   var un = cl(breath*0.30+pvar*0.30+flux*0.20+Math.min(1,dv/0.8)*0.20);
 
-  // タイプ別の主要因子（v9b 式の構成要素）
+  // ── 特徴量を6軸表示名と完全対応させる ──
+  // 表示名 → voiceScore の値へのマッピング（6軸 + 追加要素）
+  var featureMap = {
+    '温かさ':    {v:w,     color:'#F5923A'},
+    '明瞭さ':    {v:c,     color:'#4A7AC8'},
+    '可愛さ':    {v:cu,    color:'#D4B020'},
+    '独特さ':    {v:un,    color:'#9B6ED4'},
+    '柔らかさ':  {v:tilt,  color:'#4AAA5E'},  // ← 6軸に対応
+    '安定感':    {v:hnr,   color:'#7AD494'},  // ← 6軸に対応
+    '声の高さ':  {v:zcr,   color:'#FFE066'},
+    '息感':      {v:breath,color:'#6BB5AC'},
+    '声の強さ':  {v:rms,   color:'#E85252'},
+    '声の抑揚':  {v:pvar,  color:'#8AB4FF'},
+    '声の変化量':{v:flux,  color:'#5A6AD4'},
+  };
+
+  // タイプ別の主要因子（6軸名称と統一）
   var typeBreakdowns = [
-    // 赤: clarity^0.6 * rms^0.4 が主軸
-    [{n:'明瞭さ',v:c,w:0.60,c:'#4A7AC8'},{n:'声の強さ',v:rms,w:0.40,c:'#E85252'},{n:'クリーン感',v:1-breath,w:0.25,c:'#6BB5AC'}],
-    // 橙: (1-zcr)^0.5 * hnr^0.5 が主軸
-    [{n:'低音域',v:1-zcr,w:0.50,c:'#F5923A'},{n:'声の安定',v:hnr,w:0.50,c:'#FFB07C'},{n:'柔らかさ',v:tilt,w:0.30,c:'#D4B020'}],
-    // 黄: zcr^0.5 * cute^0.5 が主軸
-    [{n:'可愛さ',v:cu,w:0.55,c:'#D4B020'},{n:'声の高さ',v:zcr,w:0.45,c:'#FFE066'},{n:'声の抑揚',v:pvar,w:0.20,c:'#7AD494'}],
-    // 緑: tilt^0.5 * hnr^0.5 が主軸
-    [{n:'柔らかさ',v:tilt,w:0.55,c:'#4AAA5E'},{n:'声の安定',v:hnr,w:0.45,c:'#7AD494'},{n:'温かさ',v:w,w:0.40,c:'#A0D8A0'}],
-    // 青: breath^0.5 * (1-hnr)^0.5 が主軸
-    [{n:'息感',v:breath,w:0.60,c:'#4A7AC8'},{n:'声の揺らぎ',v:1-hnr,w:0.40,c:'#8AB4FF'},{n:'独特さ',v:un,w:0.30,c:'#9B6ED4'}],
-    // 紫: rms^2.5 が主軸
-    [{n:'声の強さ',v:rms,w:0.85,c:'#9B6ED4'},{n:'明瞭さ',v:c,w:0.25,c:'#C89AFF'}],
-    // 藍: flux が主軸
-    [{n:'声の変化量',v:flux,w:0.70,c:'#5A6AD4'},{n:'独特さ',v:un,w:0.30,c:'#A8B4FF'},{n:'声の抑揚',v:pvar,w:0.20,c:'#7AAAD4'}],
+    // 赤: 明瞭 + 強さ + (1-息感)
+    ['明瞭さ','声の強さ','安定感'],
+    // 橙: 安定感 + 柔らかさ + 温かさ
+    ['安定感','柔らかさ','温かさ'],
+    // 黄: 可愛さ + 声の高さ + 声の抑揚
+    ['可愛さ','声の高さ','声の抑揚'],
+    // 緑: 柔らかさ + 安定感 + 温かさ
+    ['柔らかさ','安定感','温かさ'],
+    // 青: 息感 + 独特さ + 声の変化量
+    ['息感','独特さ','声の変化量'],
+    // 紫: 声の強さ + 明瞭さ + 安定感
+    ['声の強さ','明瞭さ','安定感'],
+    // 藍: 声の変化量 + 独特さ + 声の抑揚
+    ['声の変化量','独特さ','声の抑揚'],
   ];
 
-  var bkd = typeBreakdowns[cls.typeIdx] || [];
-  var top = bkd.map(function(item){
-    return {name:item.n, eff:Math.round(item.v*item.w*100), color:item.c};
+  var keys = typeBreakdowns[cls.typeIdx] || ['温かさ','明瞭さ','可愛さ'];
+  var top = keys.map(function(key) {
+    var f = featureMap[key] || {v:0.5, color:'#aaa'};
+    return {name:key, eff:Math.round(f.v * 100), color:f.color};
   }).sort(function(a,b){return b.eff-a.eff;});
 
   rows.innerHTML = '';
   var maxEff = top[0] ? Math.max(top[0].eff, 1) : 1;
-  for (var i = 0; i < Math.min(top.length, 4); i++) {
+  for (var i = 0; i < top.length; i++) {
     var item = top[i];
     var div  = document.createElement('div');
     div.className = 'reason-row';
@@ -2260,7 +2288,7 @@ function renderReason(cls, vs) {
       '<div class="reason-val">+' + item.eff + '</div>';
     rows.appendChild(div);
   }
-  if (note) note.textContent = '録音した声の特徴量から算出。声質を変えると変化します。';
+  if (note) note.textContent = '録音した声から算出。声質を変えると変化します。';
   wrap.style.display = 'block';
 }
 function showResult() {
@@ -2357,8 +2385,13 @@ function showResult() {
       setDesc('vf-clarity-desc', voiceScore.clarity);
       setDesc('vf-cute-desc',    voiceScore.cute);
       setDesc('vf-unique-desc',  voiceScore.unique);
-      // ⑥ パーセンタイル拡張ポイント（将来: percentileData があれば表示）
-      // if (window.percentileData) showPercentile(voiceScore);
+      // 追加2軸: 柔らかさ(tilt) と 安定感(hnr)
+      setPct('vf-soft',   'vf-soft-val',   voiceScore.tilt || 0);
+      setPct('vf-stable', 'vf-stable-val', voiceScore.hnr  || 0);
+      setDesc('vf-soft-desc',   voiceScore.tilt || 0);
+      setDesc('vf-stable-desc', voiceScore.hnr  || 0);
+      // ⑥ パーセンタイル拡張フック（データ蓄積後に有効化）
+      // if (window.percentileData) renderPercentiles(voiceScore, window.percentileData);
 
       var ctxLabels = ['プライベートな声','友人との声','日常会話の声','発表・配信の声','パフォーマンスの声'];
       var ctxIdx    = Math.max(0, (ans[0] || 1) - 1);
@@ -2955,7 +2988,7 @@ restart = function() {
   document.getElementById('rec-dot-1').classList.add('active');
   document.getElementById('rec-dot-2').classList.remove('active');
   document.getElementById('rec-dot-3').classList.remove('active');
-  document.getElementById('voice-badge').style.display = 'none'; var vfw=document.getElementById('voice-feat-wrap'); if(vfw) vfw.style.display='none'; curSceneIdx=0; var ntw=document.getElementById('near-types-wrap'); if(ntw) ntw.style.display='none'; var rw=document.getElementById('reason-wrap'); if(rw) rw.style.display='none';
+  document.getElementById('voice-badge').style.display = 'none'; var vfw=document.getElementById('voice-feat-wrap'); if(vfw) vfw.style.display='none'; curSceneIdx=0; ['vf-soft','vf-stable'].forEach(function(id){var el=document.getElementById(id);if(el)el.style.width='0%';}); var ntw=document.getElementById('near-types-wrap'); if(ntw) ntw.style.display='none'; var rw=document.getElementById('reason-wrap'); if(rw) rw.style.display='none';
   var errEl = document.getElementById('rec-error-box'); if(errEl){errEl.style.display='none';errEl.textContent='';}
   document.getElementById('recorder-section').classList.remove('show');
   _origRestart();
@@ -3104,6 +3137,38 @@ function populateDebugPanel() {
 }
 
 
+
+// ============================================================
+// パーセンタイル表示（将来の拡張フック）
+// percentileData = {warmth:[mean,std], clarity:[...], ...} の形式で渡す
+// 例: window.percentileData = {warmth:[0.55,0.12], cute:[0.48,0.15], ...}
+// ============================================================
+function renderPercentiles(vs, data) {
+  if (!vs || !data) return;
+  var axes = ['warmth','clarity','cute','unique','soft','stable'];
+  var vals = [vs.warmth, vs.clarity, vs.cute, vs.unique, vs.tilt||0, vs.hnr||0];
+  for (var i = 0; i < axes.length; i++) {
+    var key = axes[i];
+    if (!data[key]) continue;
+    var mean = data[key][0], std = data[key][1];
+    if (!std) continue;
+    var z    = (vals[i] - mean) / std;
+    // 正規分布近似でパーセンタイル計算
+    var pct  = Math.round((1 - normCDF(z)) * 100);
+    pct = Math.max(1, Math.min(99, pct));
+    var el = document.getElementById('vf-' + key + '-pct');
+    if (el) {
+      el.textContent = ' 上位' + pct + '%';
+      el.classList.add('active');
+    }
+  }
+}
+function normCDF(z) {
+  var t = 1 / (1 + 0.2316419 * Math.abs(z));
+  var d = 0.3989423 * Math.exp(-z*z/2);
+  var p = d*t*(0.3193815+t*(-0.3565638+t*(1.7814779+t*(-1.8212560+t*1.3302744))));
+  return z > 0 ? 1 - p : p;
+}
 </script>
 <div class="toast" id="toast"></div>
 </body>
