@@ -2050,6 +2050,7 @@ function checkInconsistency(q) {
 }
 
 function renderQ() {
+  console.log('SHOW_QUESTION');
   console.log('[質問画面] renderQ called, cQ=' + cQ);
   try {
   var q=QS[cQ];
@@ -2296,6 +2297,11 @@ function renderReason(cls, vs) {
   wrap.style.display = 'block';
 }
 function showResult() {
+  // 診断前にはこの関数を動かさない（ans未回答ならreturn）
+  if (!ans || (ans[0]===0 && ans[1]===0 && ans[2]===0)) {
+    console.error('[結果画面] 診断未完了のためshowResultを中断');
+    return;
+  }
   document.getElementById('analyzing').style.display = 'none';
   document.getElementById('result-sec').style.display = 'block';
 
@@ -2458,7 +2464,9 @@ function refreshScene() {
 
 function drawRadar(vec,color) {
   var canvas=document.getElementById('radarChart');
+  if (!canvas || !canvas.getContext) return;
   var ctx=canvas.getContext('2d');
+  if (!ctx) return;
   var W=canvas.width,H=canvas.height,cx=W/2,cy=H/2,maxR=Math.min(W,H)/2-34,N=vec.length;
   ctx.clearRect(0,0,W,H);
   for(var ring=1;ring<=5;ring++){
@@ -2957,6 +2965,7 @@ function finishAnalysis() {
 // Override startDiag to go to recorder first
 var _origStartDiag = startDiag;
 startDiag = function() {
+  console.log('START_BUTTON');
   console.log('[診断開始] startDiag called');
   try {
     var hero = document.getElementById('hero');
@@ -2987,6 +2996,7 @@ startDiag = function() {
 
       rec.style.display = 'block';
       rec.classList.add('show');
+      console.log('SHOW_RECORDING');
       console.log('[診断開始] 録音画面へ遷移');
     } else {
       // recorder-section がなければ直接クイズへ（フォールバック）
