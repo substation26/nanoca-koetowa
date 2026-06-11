@@ -2050,7 +2050,10 @@ function checkInconsistency(q) {
 }
 
 function renderQ() {
+  console.log('[質問画面] renderQ called, cQ=' + cQ);
+  try {
   var q=QS[cQ];
+  if (!q) { console.error('[質問画面] QS[' + cQ + '] が存在しません'); return; }
   document.getElementById('q-num-lbl').textContent='Q'+(cQ+1)+' / '+QS.length;
   document.getElementById('q-param-lbl').textContent=q.param;
   document.getElementById('q-txt').textContent=q.txt;
@@ -2080,7 +2083,8 @@ function renderQ() {
   }
   document.getElementById('nxt-btn').classList.remove('vis');
   var card=document.getElementById('q-card');
-  card.style.animation='none';card.offsetHeight;card.style.animation='fadeUp .42s cubic-bezier(.34,1.2,.64,1) both';
+  if (card) { card.style.animation='none';card.offsetHeight;card.style.animation='fadeUp .42s cubic-bezier(.34,1.2,.64,1) both'; }
+  } catch(e) { console.error('[質問画面] renderQ エラー:', e); }
 }
 
 // selL replaced by opt-btn onclick
@@ -2543,10 +2547,12 @@ function showRecorder() {
 }
 
 function skipRecording() {
+  console.log('[スキップ] 録音スキップ → クイズへ遷移');
   voiceScore = null;
   var rec = document.getElementById('recorder-section');
   if (rec) { rec.style.display = 'none'; rec.classList.remove('show'); }
-  document.getElementById('quiz-wrap').style.display = 'block';
+  var qw = document.getElementById('quiz-wrap');
+  if (qw) qw.style.display = 'block';
   window.scrollTo({top: 0, behavior: 'smooth'});
   renderQ();
 }
@@ -2951,11 +2957,52 @@ function finishAnalysis() {
 // Override startDiag to go to recorder first
 var _origStartDiag = startDiag;
 startDiag = function() {
-  var hero = document.getElementById('hero');
-  var rec = document.getElementById('recorder-section');
-  if (hero) hero.style.display = 'none';
-  if (rec) { rec.style.display = 'block'; rec.classList.add('show'); }
-  window.scrollTo({top: 0, behavior: 'smooth'});
+  console.log('[診断開始] startDiag called');
+  try {
+    var hero = document.getElementById('hero');
+    var rec  = document.getElementById('recorder-section');
+
+    if (hero) hero.style.display = 'none';
+
+    // recorder-section が存在する場合は録音画面へ
+    if (rec) {
+      // 録音UIを初期化（前回の状態をリセット）
+      var micBtn = document.getElementById('rec-mic-btn');
+      if (micBtn) {
+        micBtn.classList.remove('recording');
+        micBtn.textContent = '🎤';
+        micBtn.onclick = startRecording;
+        micBtn.style.display = '';
+      }
+      var skipBtn = document.getElementById('rec-skip-btn');
+      if (skipBtn) skipBtn.style.display = '';
+
+      var statusEl = document.getElementById('rec-status');
+      if (statusEl) {
+        statusEl.textContent = 'タップして録音開始';
+        statusEl.className = 'rec-status';
+      }
+      var errBox = document.getElementById('rec-error-box');
+      if (errBox) { errBox.style.display = 'none'; errBox.textContent = ''; }
+
+      rec.style.display = 'block';
+      rec.classList.add('show');
+      console.log('[診断開始] 録音画面へ遷移');
+    } else {
+      // recorder-section がなければ直接クイズへ（フォールバック）
+      console.log('[診断開始] 録音画面なし → クイズへ直接遷移');
+      var qw = document.getElementById('quiz-wrap');
+      if (qw) qw.style.display = 'block';
+      renderQ();
+    }
+    window.scrollTo({top: 0, behavior: 'smooth'});
+  } catch(e) {
+    console.error('[診断開始] startDiag エラー:', e);
+    // エラー時はフォールバックとしてクイズへ直接遷移
+    var qw = document.getElementById('quiz-wrap');
+    if (qw) qw.style.display = 'block';
+    try { renderQ(); } catch(e2) { console.error('renderQ error:', e2); }
+  }
 };
 
 // Override showResult to blend voice scores
