@@ -1584,7 +1584,7 @@ var QS = [
 var RESULTS = [
   {
     sc:'rs-0', name:'赤のリーダーボイス', en:'Red Leader Voice',
-    catch:'混沌の中でも届く、指揮官の声',
+    catchCopy:'混沌の中でも届く、指揮官の声',
     role:'⚔️ 前衛リーダー（勇者・騎士）',
     c1:'#E85252', c2:'#F5A060', lb:'#E85252', pb:'rgba(232,82,82,.2)', pc:'#FF9999',
     // 結果画面テキスト（一般語）
@@ -1638,7 +1638,7 @@ var RESULTS = [
   },
   {
     sc:'rs-1', name:'橙のガーディアンボイス', en:'Orange Guardian Voice',
-    catch:'どっしり構え、場を包む守護の声',
+    catchCopy:'どっしり構え、場を包む守護の声',
     role:'🛡️ 重厚タンク・高レベル魔術師',
     c1:'#F5923A', c2:'#F5C060', lb:'#E8843A', pb:'rgba(245,146,58,.2)', pc:'#FFB07C',
     firstImpression:'あなたの声は、聞いた人をほっとさせる力があります。話しているだけで、周りの緊張がほぐれていく、そんな声です。',
@@ -1689,7 +1689,7 @@ var RESULTS = [
   },
   {
     sc:'rs-2', name:'黄のスカウトボイス', en:'Yellow Scout Voice',
-    catch:'好奇心と軽やかさで先を照らす、探索者の声',
+    catchCopy:'好奇心と軽やかさで先を照らす、探索者の声',
     role:'⭐ 斥候（スカウト）・妖精の相棒',
     c1:'#D4B020', c2:'#F5D87A', lb:'#C09020', pb:'rgba(212,176,32,.2)', pc:'#FFE066',
     firstImpression:'あなたの声は、聞くだけで元気が出てくる声です。話しているとき、周りの人が自然と笑顔になります。',
@@ -1740,7 +1740,7 @@ var RESULTS = [
   },
   {
     sc:'rs-3', name:'緑のヒーラーボイス', en:'Green Healer Voice',
-    catch:'やわらかく包み込み、心を癒す声',
+    catchCopy:'やわらかく包み込み、心を癒す声',
     role:'💚 聖職者（僧侶・ヒーラー）',
     c1:'#4AAA5E', c2:'#A0D8A0', lb:'#3A7040', pb:'rgba(74,170,94,.2)', pc:'#7AD494',
     firstImpression:'あなたの声は、聞いた人の心をほっとさせる力があります。声を聞いているだけで、不安な気持ちが落ち着いてくる、そんな声です。',
@@ -1791,7 +1791,7 @@ var RESULTS = [
   },
   {
     sc:'rs-4', name:'青のミステリアスボイス', en:'Blue Mysterious Voice',
-    catch:'一度聴いたら忘れられない、謎めいた声',
+    catchCopy:'一度聴いたら忘れられない、謎めいた声',
     role:'🗡️ 盗賊（ローグ）・暗殺者',
     c1:'#4A7AC8', c2:'#7AAAD4', lb:'#3A6FA5', pb:'rgba(74,122,200,.2)', pc:'#8AB4FF',
     firstImpression:'あなたの声は、一度聞いたら忘れられない個性があります。声に記憶に残る何かがあって、「あの人、どんな声だったっけ」と思い出されやすいです。',
@@ -1842,7 +1842,7 @@ var RESULTS = [
   },
   {
     sc:'rs-5', name:'紫のカリスマボイス', en:'Purple Charisma Voice',
-    catch:'場を支配し、人を惹きつける、磁力の声',
+    catchCopy:'場を支配し、人を惹きつける、磁力の声',
     role:'✨ 知識豊富な賢者・錬金術師',
     c1:'#9B6ED4', c2:'#B8A0D8', lb:'#7B5EA7', pb:'rgba(155,110,212,.2)', pc:'#C89AFF',
     firstImpression:'あなたの声は、聞いた瞬間に「この人は特別だ」と感じさせる力があります。声の存在感が、言葉よりも先に相手の心に届きます。',
@@ -1893,7 +1893,7 @@ var RESULTS = [
   },
   {
     sc:'rs-6', name:'藍のトリックボイス', en:'Indigo Trick Voice',
-    catch:'変幻自在に声を操り、予測を超える声',
+    catchCopy:'変幻自在に声を操り、予測を超える声',
     role:'🎭 吟遊詩人・予測不能な魔術師',
     c1:'#5A6AD4', c2:'#8A6AC8', lb:'#2D4A8A', pb:'rgba(90,106,212,.2)', pc:'#A8B4FF',
     firstImpression:'あなたの声は、いつも「次に何が来るんだろう」という期待感を生み出します。声のバリエーションが豊かで、聞き飽きることがありません。',
@@ -2327,7 +2327,7 @@ function showResult() {
   document.getElementById('res-name').textContent = r.name;
   document.getElementById('res-name').style.color  = r.c1;
   document.getElementById('res-en').textContent    = r.en;
-  document.getElementById('res-catch').textContent = r.catch;
+  document.getElementById('res-catch').textContent = r.catchCopy;
 
   var pill = document.getElementById('res-pill');
   pill.textContent   = r.role;
@@ -2486,7 +2486,7 @@ function getTxt(){
     '🎙️ 声キャラ7色診断 | nanoca Inc.',
     '',
     '「'+curRes.name+'」',
-    curRes.catch || curRes.en,
+    curRes.catchCopy || curRes.en,
     '確信度：'+curRes.confidence+'%',
     '',
     '▼ 私の声の特性',
@@ -3027,11 +3027,11 @@ restart = function() {
   document.getElementById('rec-countdown-wrap').classList.remove('show');
   ['ana-step-1','ana-step-2','ana-step-3'].forEach(function(id){
     var el = document.getElementById(id);
-    el.classList.remove('active','done');
+    if (el) { el.classList.remove('active'); el.classList.remove('done'); }
   });
-  document.getElementById('ana-step-1').querySelector('.rec-ana-icon').textContent = '📊';
-  document.getElementById('ana-step-2').querySelector('.rec-ana-icon').textContent = '💪';
-  document.getElementById('ana-step-3').querySelector('.rec-ana-icon').textContent = '🌊';
+  (function(){var _s=document.getElementById('ana-step-1');if(_s){var _i=_s.querySelector('.rec-ana-icon');if(_i)_i.textContent='📊';}})();
+  (function(){var _s=document.getElementById('ana-step-2');if(_s){var _i=_s.querySelector('.rec-ana-icon');if(_i)_i.textContent='💪';}})();
+  (function(){var _s=document.getElementById('ana-step-3');if(_s){var _i=_s.querySelector('.rec-ana-icon');if(_i)_i.textContent='🌊';}})();
   document.getElementById('rec-dot-1').classList.add('active');
   document.getElementById('rec-dot-2').classList.remove('active');
   document.getElementById('rec-dot-3').classList.remove('active');
@@ -3050,7 +3050,10 @@ var debugVisible = true;
 function toggleDebug() {
   debugVisible = !debugVisible;
   var panel = document.getElementById('debug-panel');
-  if (panel) panel.classList.toggle('show', debugVisible);
+  if (panel) {
+    if (debugVisible) { panel.classList.add('show'); }
+    else              { panel.classList.remove('show'); }
+  }
   var btn = document.querySelector('.debug-toggle-btn');
   if (btn) btn.textContent = debugVisible ? '分析を隠す' : '🔬 あなたの声をこう分析しました';
   if (debugVisible) populateDebugPanel();
